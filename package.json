@@ -1,0 +1,41 @@
+{
+  "name": "mcscanx-synteny-visualizer",
+  "version": "1.0.0",
+  "description": "UofS HCI synteny visualization tool for mcscanx collinearity files",
+  "main": "src/app.js",
+  "scripts": {
+    "start": "webpack-dev-server --config ./build-config/webpack.config.js --watch-poll",
+    "build": "webpack --config ./build-config/webpack.prod.config.js",
+    "deploy": "npm run build && npm run deploy-gh",
+    "deploy-gh": "gh-pages -d build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kiranbandi/mcscanx-synteny-visualizer.git"
+  },
+  "keywords": [
+    "synteny",
+    "visualization",
+    "whole-genome"
+  ],
+  "author": "kiranbandi",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/kiranbandi/mcscanx-synteny-visualizer/issues"
+  },
+  "homepage": "https://github.com/kiranbandi/mcscanx-synteny-visualizer#readme",
+  "devDependencies": {
+    "babel-core": "^6.26.0",
+    "babel-loader": "^7.1.2",
+    "babel-minify-webpack-plugin": "^0.2.0",
+    "babel-polyfill": "^6.26.0",
+    "gh-pages": "^0.12.0",
+    "uglifyjs-webpack-plugin": "^1.0.1",
+    "webpack": "^3.8.1",
+    "webpack-dev-server": "^2.9.4"
+  },
+  "dependencies": {
+    "p5": "^0.5.16",
+    "axios": "^0.17.1"
+  }
+}
