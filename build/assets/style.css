@@ -1,8 +1,9 @@
-#loaderText {
-    font-family: sans-serif;
-    text-align: center;
-    text-transform: uppercase;
-    margin: 40px;
-    color: #4e89bd;
-  }
-  
+.subInfoTitle {
+    font-weight: bold;
+    text-transform: capitalize;
+}
+
+.pieText {
+    font-size: 1.5em;
+    font-weight: bold;
+}

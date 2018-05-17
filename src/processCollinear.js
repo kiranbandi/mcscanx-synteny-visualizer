@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 export default function(collinearityData) {
 
     // The first 11 lines contain information regarding the MCSCANX Parameters
@@ -18,7 +20,8 @@ export default function(collinearityData) {
                 }
                 alignmentBuffer = parseAlignmentDetails(line);
                 alignmentBuffer.links = [];
-            } else {
+            } else if (line.trim().length > 1) {
+                // condition to skip empty lines
                 alignmentBuffer.links.push(parseLink(line));
             }
         })
@@ -31,18 +34,18 @@ export default function(collinearityData) {
 
 function parseInformation(informationLines) {
     return {
-        'PARAMS': {
-            'MATCH_SCORE': informationLines[1].split(':')[1].trim(),
-            'MATCH_SIZE': informationLines[2].split(':')[1].trim(),
-            'GAP_PENALTY': informationLines[3].split(':')[1].trim(),
-            'OVERLAP_WINDOW': informationLines[4].split(':')[1].trim(),
-            'E_VALUE': informationLines[5].split(':')[1].trim(),
-            'MAX_GAPS': informationLines[6].split(':')[1].trim()
-        },
-        'STATS': {
-            'NO_OF_COLLINEAR_GENES': informationLines[8].split(',')[0].split(":")[1].trim(),
-            'PERCENTAGE': informationLines[8].split(',')[1].split(":")[1].trim(),
-            'NO_OF_ALL_GENES': informationLines[8].split(',')[1].split(":")[1].trim()
+        'parameters': [
+            ['match score', informationLines[1].split(':')[1].trim()],
+            ['match size', informationLines[2].split(':')[1].trim()],
+            ['gap penality', informationLines[3].split(':')[1].trim()],
+            ['overlap wndow', informationLines[4].split(':')[1].trim()],
+            ['e value', informationLines[5].split(':')[1].trim()],
+            ['maximum gaps', informationLines[6].split(':')[1].trim()]
+        ],
+        'stats': {
+            'no_of_collinear_genes': informationLines[8].split(',')[0].split(":")[1].trim(),
+            'percentage': Number(informationLines[8].split(',')[1].split(":")[1].trim()),
+            'no_of_all_genes': informationLines[8].split(',')[1].split(":")[1].trim()
         }
     };
 }
@@ -61,10 +64,12 @@ function parseAlignmentDetails(alignmentDetails) {
 }
 
 function parseLink(link) {
-    let linkInfo = link.split('\t');
+
+    let linkInfo = link.split(":")[1].trim().split(/\s+/);
+
     return {
-        'score': linkInfo[1].trim(),
-        'target': linkInfo[2].trim(),
-        'e_value': linkInfo[3].trim()
+        'score': linkInfo[0],
+        'target': linkInfo[1],
+        'e_value': linkInfo[2]
     };
 }

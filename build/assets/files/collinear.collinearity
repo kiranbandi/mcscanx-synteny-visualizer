@@ -10,11 +10,11 @@
 # Number of all genes: 111382
 ##########################################
 ## Alignment 0: score=322.0 e_value=6.5e-13 N=7 Scaffold00208b&bn13 minus
-  0-  0:	Bna00208bs0030.1	BnaN13g19490.1	      0
+  0-  0:	Bna00208bs0030.1	BnaN13g19490.1        0
   0-  1:	Bna00208bs0040.1	BnaN13g19480.1	      0
   0-  2:	Bna00208bs0100.1	BnaN13g19400.1	      0
-  0-  3:	Bna00208bs0120.1	BnaN13g19390.1	      0
-  0-  4:	Bna00208bs0210.1	BnaN13g19340.1	 2e-102
+  0-  3:	Bna00208bs0120.1  BnaN13g19390.1	      0
+  0-  4:	Bna00208bs0210.1	BnaN13g19340.1   2e-102
   0-  5:	Bna00208bs0220.1	BnaN13g19330.1	  4e-80
   0-  6:	Bna00208bs0230.1	BnaN13g19300.1	  7e-76
 ## Alignment 1: score=599.0 e_value=3e-30 N=13 Scaffold00208b&bn14 plus
