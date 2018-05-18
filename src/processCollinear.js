@@ -54,12 +54,14 @@ function parseInformation(informationLines) {
 function parseAlignmentDetails(alignmentDetails) {
     let alignmentDetailsList = alignmentDetails.split(' ');
     return {
-        'score': alignmentDetailsList[3].split('=')[1].trim(),
+        'score': Number(alignmentDetailsList[3].split('=')[1].trim()),
         'e_value': alignmentDetailsList[4].split('=')[1].trim(),
-        'count': alignmentDetailsList[5].split('=')[1].trim(),
+        'count': Number(alignmentDetailsList[5].split('=')[1].trim()),
         'type': alignmentDetailsList[7].trim(),
         'source': alignmentDetailsList[6].split('&')[0].trim(),
-        'target': alignmentDetailsList[6].split('&')[1].trim()
+        'target': alignmentDetailsList[6].split('&')[1].trim(),
+        'sourceKey': Number(alignmentDetailsList[6].split('&')[0].trim().slice(2)),
+        'targetKey': Number(alignmentDetailsList[6].split('&')[1].trim().slice(2))
     };
 }
 
@@ -68,7 +70,7 @@ function parseLink(link) {
     let linkInfo = link.split(":")[1].trim().split(/\s+/);
 
     return {
-        'score': linkInfo[0],
+        'source': linkInfo[0],
         'target': linkInfo[1],
         'e_value': linkInfo[2]
     };

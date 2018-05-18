@@ -24,7 +24,6 @@ export default function(container, information) {
         .attr('class', 'subInfoTitle')
         .text((d) => d[0] + " : " + d[1]);
 
-
     let width = (graphicContainer.node().clientWidth) / 2,
         radius = width / 2;
 
@@ -63,6 +62,10 @@ export default function(container, information) {
 
         textFiller = vis.append('svg:text')
         .attr('class', 'pieText')
-        .attr('transform', 'translate(-' + 0.2 * radius + ',-' + 0.2 * radius + ')')
-        .text(information.stats.percentage + " %")
+        .text(information.stats.percentage + "%")
+
+    textFiller.attr('transform', function() {
+        return 'translate(-' + (this.clientWidth / 2) + ',-' + 0.2 * radius + ')';
+    })
+
 }
