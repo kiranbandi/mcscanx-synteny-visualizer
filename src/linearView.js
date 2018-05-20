@@ -21,163 +21,160 @@ export default function(information, alignmentList, genomeLibrary, chromosomeMap
         linearViewVis = linearViewMainContainer.append('svg')
         .attr('class', 'linearViewVis')
         .attr('height', width)
-        .attr('width', width);
+        .attr('width', width)
 
     infoVisualization(headContainer, information);
 
     let sourceKeys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
         targetKeys = [11, 12, 13, 14, 15, 16, 17, 18, 19];
 
+    let topPosition = 100,
+        bottomPosition = 350;
 
-    let sourceMarkerInfo = drawmarkers(linearViewVis, sourceKeys, chromosomeMap, 100, 'source', true, colorScale),
-        targetMarkerInfo = drawmarkers(linearViewVis, targetKeys, chromosomeMap, 350, 'target', false, colorScale);
+    let sourceMarkers = markers(linearViewVis, sourceKeys, chromosomeMap, topPosition);
+    let targetMarkers = markers(linearViewVis, targetKeys, chromosomeMap, bottomPosition);
 
-    let filteredAlignmentList = filterAlignmentList(sourceKeys, targetKeys, alignmentList);
+    let filteredAlignmentCollection = filterAlignmentList(sourceKeys, targetKeys, alignmentList);
 
-    let linksVis = _.map(filteredAlignmentList, (alignment) => {
+    let linksUpdated = _.map(filteredAlignmentCollection, (alignment) => {
 
         let firstLink = alignment.links[0];
+        let lastLink = alignment.links[alignment.links.length - 1];
 
-        if (alignment.isFlipped) {
+        let sourceGenes = genomeLibrary.get(firstLink.source).start < genomeLibrary.get(lastLink.source).start ? [firstLink.source, lastLink.source] : [lastLink.source, firstLink.source];
+        let targetGenes = genomeLibrary.get(firstLink.target).start < genomeLibrary.get(lastLink.target).start ? [firstLink.target, lastLink.target] : [lastLink.target, firstLink.target];
 
-            let sourceMarkerStartForChromosome = sourceMarkerInfo.markerCoordinatesMap[alignment.targetKey];
-            let targetMarkerStartForChromosome = targetMarkerInfo.markerCoordinatesMap[alignment.sourceKey];
-
-            let sourceChromosome = chromosomeMap.get(alignment.targetKey);
-            let targetChromosome = chromosomeMap.get(alignment.sourceKey);
-
-            // polygon coordinates numbering start in a circular fashion from top left to bottom left
-            let polygonCoordinates_1 = genomeLibrary.get(firstLink.target).start;
-            let polygonCoordinates_4 = genomeLibrary.get(firstLink.source).start;
-
-            polygonCoordinates_1 = sourceMarkerStartForChromosome[0] + ((polygonCoordinates_1 - sourceChromosome.start) * sourceMarkerInfo.scaleFactor)
-            polygonCoordinates_4 = targetMarkerStartForChromosome[0] + ((polygonCoordinates_4 - targetChromosome.start) * targetMarkerInfo.scaleFactor)
-
-            return [alignment.targetKey, polygonCoordinates_1, polygonCoordinates_4];
-
-        }
-
-
-        let sourceMarkerStartForChromosome = sourceMarkerInfo.markerCoordinatesMap[alignment.sourceKey];
-        let targetMarkerStartForChromosome = targetMarkerInfo.markerCoordinatesMap[alignment.targetKey];
+        _.each([0, 1], (value) => {
+            sourceGenes[value] = genomeLibrary.get(sourceGenes[value]).start;
+            targetGenes[value] = genomeLibrary.get(targetGenes[value]).start;
+        })
 
         let sourceChromosome = chromosomeMap.get(alignment.sourceKey);
         let targetChromosome = chromosomeMap.get(alignment.targetKey);
 
-        // polygon coordinates numbering start in a circular fashion from top left to bottom left
-        let polygonCoordinates_1 = genomeLibrary.get(firstLink.source).start;
-        let polygonCoordinates_4 = genomeLibrary.get(firstLink.target).start;
+        let sourceMarker = _.find(sourceMarkers, (o) => o.key == alignment.sourceKey);
+        let targetMarker = _.find(targetMarkers, (o) => o.key == alignment.targetKey);
 
-        polygonCoordinates_1 = sourceMarkerStartForChromosome[0] + ((polygonCoordinates_1 - sourceChromosome.start) * sourceMarkerInfo.scaleFactor)
-        polygonCoordinates_4 = targetMarkerStartForChromosome[0] + ((polygonCoordinates_4 - targetChromosome.start) * targetMarkerInfo.scaleFactor)
+        let sourceGeneWidth = ((sourceGenes[1] - sourceGenes[0]) / (sourceChromosome.width)) * (sourceMarker.dx / 2);
+        let sourceX = ((sourceGenes[0] - sourceChromosome.start) / (sourceChromosome.width)) * (sourceMarker.dx);
+        let targetX = ((targetGenes[0] - targetChromosome.start) / (targetChromosome.width)) * (targetMarker.dx);
 
-        return [alignment.sourceKey, polygonCoordinates_1, polygonCoordinates_4];
+        sourceGeneWidth = Math.max(sourceGeneWidth, 2);
+
+        return {
+
+            source: {
+                'x': sourceMarker.x + sourceX + sourceGeneWidth,
+                'y': topPosition
+            },
+            target: {
+                'x': targetMarker.x + targetX + sourceGeneWidth,
+                'y': bottomPosition
+            },
+            key: alignment.sourceKey,
+            width: sourceGeneWidth
+        }
+
+
     })
 
-    linearViewVis.selectAll('alignmentLink')
-        .data(linksVis)
+    function link(d) {
+
+        // big changes here obviously, more comments to follow
+        var x0 = d.source.x,
+            x1 = d.target.x,
+            y0 = d.source.y,
+            y1 = d.target.y,
+            yi = d3.interpolateNumber(y0, y1),
+            y2 = yi(0.65),
+            y3 = yi(1 - 0.65);
+
+        // ToDo - nice to have - allow flow up or down! Plenty of use cases for starting at the bottom,
+        // but main one is trickle down (economics, budgets etc), not up
+
+        return "M" + x0 + "," + y0 // start (of SVG path)
+            +
+            "C" + x0 + "," + y2 // CP1 (curve control point)
+            +
+            " " + x1 + "," + y3 // CP2
+            +
+            " " + x1 + "," + y1; // end
+    }
+
+    // stroke width takes half the width so we draw a line and depending on the width needed offset the x position 
+    // so that x is reduced by half of the intended width :-)
+
+    linearViewVis.append("g")
+        .selectAll('.link')
+        .data(linksUpdated)
         .enter()
-        .append('line')
-        .style('stroke', (d) => {
-            return colorScale[d[0] - 1];
+        .append("path")
+        .attr("class", "link")
+        .attr("d", function(d) {
+            return link(d);
         })
-        .style('opacity', 0.50)
-        .attr('class', 'alignmentLink')
-        .attr('x1', (d) => d[1])
-        .attr('y1', 100)
-        .attr('x2', (d) => d[2])
-        .attr('y2', 350)
+        .style("stroke-width", function(d) {
+            return d.width;
+        })
+        .style('stroke', (d, i) => {
+            return d3.schemeCategory10[d.key - 1];
+        });
 }
 
 
 function filterAlignmentList(sourceKeys, targetKeys, alignmentList) {
-    let sourceKeysCopy = [1, 3, 9];
     return _.filter(alignmentList, (alignment) => {
-        let sourceAndTarget = alignment.sourceKey && alignment.targetKey && (sourceKeysCopy.indexOf(alignment.sourceKey) > -1) && (targetKeys.indexOf(alignment.targetKey) > -1),
-            targetAndSrouce = alignment.sourceKey && alignment.targetKey && (sourceKeysCopy.indexOf(alignment.targetKey) > -1) && (targetKeys.indexOf(alignment.sourceKey) > -1);
-
-        if (targetAndSrouce) {
-            alignment.isFlipped = true;
-        }
-
-        return (sourceAndTarget || targetAndSrouce);
+        let sourceAndTarget = alignment.sourceKey && alignment.targetKey && (sourceKeys.indexOf(alignment.sourceKey) > -1) && (targetKeys.indexOf(alignment.targetKey) > -1);
+        return (sourceAndTarget);
     });
 }
 
-function drawmarkers(svgContainer, keys, chromosomeCollection, positionFromTop, markerIndex, isSource = false, colorScale) {
 
-    let chromosomeWidthList = [],
-        sumStore = 0,
-        width = svgContainer.node().clientWidth;
+function markers(svgContainer, keys, chromosomeCollection, positionFromTop) {
 
-    _.each(keys, (chromosomeKey) => {
-        let chromosomeWidth = chromosomeCollection.get(chromosomeKey).end - chromosomeCollection.get(chromosomeKey).start
-        chromosomeWidthList.push([sumStore, chromosomeWidth]);
-        sumStore += chromosomeWidth;
-    })
+    let width = svgContainer.node().clientWidth;
+    // 90% of the total width is used for markers and the rest is used 
+    // for creating gap between the markers except for the first marker
+    let scaleFactor = (width * 0.90) / _.sumBy(keys, (key) => chromosomeCollection.get(key).width),
+        markerPaddingToLeft = (width * 0.10) / (keys.length - 1);
 
-    // gap of 0.1% to account for rounded corners around the chromosome markers which extend beyond the width
-    // so complete width is not used and a small area is left free
-    let scaleFactor = (width * 0.89) / _.sumBy(chromosomeWidthList, (o) => o[1]),
-        markerPadding = (width * 0.10) / keys.length;
+    // keep track of width that has been consumed to the left of the current element
+    let previousWidthStore = 0;
 
-    // calculate x positions of markers and return them so that they can be used for placing connector lines
-    let markerCoordinates = _.map(chromosomeWidthList, (chromosomeWidth, index) => {
-        return [(chromosomeWidth[0] * scaleFactor) + ((index + 1) * markerPadding), ((chromosomeWidth[0] + chromosomeWidth[1]) * scaleFactor) + ((index + 1) * markerPadding)];
+    let markers = _.map(keys, (key, index) => {
+        let marker = {
+            'key': key,
+            // marker start point = used space + padding of element (no padding for first element)
+            'x': previousWidthStore + (index == 0 ? 0 : markerPaddingToLeft),
+            // width of the marker
+            'dx': (scaleFactor * chromosomeCollection.get(key).width)
+        }
+        previousWidthStore = marker.x + marker.dx;
+        return marker;
     })
 
     let markerContainer = svgContainer
         .append('g')
-        .attr('class', 'markerContainer' + '-' + markerIndex);
+        .attr('class', 'markerContainer-new')
 
     let chromosomeMarkers = markerContainer
         .selectAll('.marker')
-        .data(markerCoordinates)
+        .data(markers)
         .enter()
         .append('line')
         .attr('class', 'marker')
         .style('stroke', (d, i) => {
-            if (isSource) {
-                return colorScale[i];
-            } else {
-                return (i % 2) == 0 ? 'black' : 'grey';
-            }
+            return d3.schemeCategory10[i];
         })
-        .style('stroke-width', '0.75em')
+        .style('stroke-width', '7.5px')
         .style('stroke-linecap', 'round')
-        .attr('x1', (d) => d[0])
+        .attr('x1', (d) => d.x)
         .attr('y1', positionFromTop)
-        .attr('x2', (d) => d[1])
+        .attr('x2', (d) => {
+            return (d.x + d.dx);
+        })
         .attr('y2', positionFromTop);
 
+    return markers;
 
-    let chromosomeMarkerTexts = markerContainer
-        .selectAll('.markerText')
-        .data(keys)
-        .enter()
-        .append('text')
-        .attr('class', 'markerText')
-        .style('color', (d, i) => {
-            return 'black';
-        })
-        .attr('y', (d) => {
-            return (positionFromTop + ((isSource ? -1 : 1) * 25))
-        })
-        .text((d) => {
-            return "Chr " + d;
-        })
-        .attr('x', function(d, i) {
-            let position = ((markerCoordinates[i][0] + markerCoordinates[i][1]) / 2);
-            // subtracting the elements own width ensure its centered above the chromosome
-            return position - (this.clientWidth / 2);
-        })
-
-    let markerCoordinatesMap = {};
-
-    // create an object map with chromosomeMapKeys and their coordinates
-    _.each(keys, (key, index) => {
-        markerCoordinatesMap[key] = markerCoordinates[index];
-    })
-
-    return { scaleFactor, markerCoordinatesMap };
 }

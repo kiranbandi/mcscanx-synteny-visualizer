@@ -1,5 +1,4 @@
 export default function(gffData) {
-
     var genomeEntry,
         genomeLibrary = new Map(),
         chromosomeMap = new Map();
@@ -36,11 +35,16 @@ export default function(gffData) {
                 if (geneEnd > entry.end) {
                     entry.end = geneEnd;
                 }
+
                 chromosomeMap.set(chromosomeId, entry);
             }
         }
     })
 
-    return { genomeLibrary, chromosomeMap };
+    // once all parsing is done set width of each chromosome
+    chromosomeMap.forEach((chromosome) => {
+        chromosome.width = chromosome.end - chromosome.start;
+    })
 
+    return { genomeLibrary, chromosomeMap };
 };
