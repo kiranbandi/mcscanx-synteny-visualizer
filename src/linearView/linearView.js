@@ -3,33 +3,17 @@ import _ from 'lodash';
 import markerSetup from './markers';
 import linkSetup from './links';
 
-export default function(svg, alignmentList, genomeLibrary, chromosomeMap) {
+export default function(svg, configuration, alignmentList, genomeLibrary, chromosomeMap) {
 
-    let width = svg.attr('width');
-    // markerPositions and links are populated 
-    let linearViewConfig = {
-        'width': width,
-        'verticalPositions': {
-            'source': 100,
-            'target': 350
-        },
-        'markers': {
-            'source': [1, 2, 3, 4, 5, 6],
-            'target': [11, 12, 13, 14, 15]
-        },
-        'markerPositions': {},
-        'links': []
-    };
-
-    linearViewConfig = markerSetup(svg, linearViewConfig, chromosomeMap);
-    let processedAlignmentList = filterAndFlipAlignmentList(linearViewConfig, alignmentList);
-    linkSetup(svg, linearViewConfig, processedAlignmentList, chromosomeMap, genomeLibrary);
+    configuration = markerSetup(svg, configuration, chromosomeMap);
+    let processedAlignmentList = filterAndFlipAlignmentList(configuration, alignmentList);
+    linkSetup(svg, configuration, processedAlignmentList, chromosomeMap, genomeLibrary);
 }
 
-function filterAndFlipAlignmentList(linearViewConfig, alignmentList) {
+function filterAndFlipAlignmentList(configuration, alignmentList) {
 
-    let sourceKeyList = linearViewConfig.markers.source,
-        targetKeyList = linearViewConfig.markers.target,
+    let sourceKeyList = configuration.markers.source,
+        targetKeyList = configuration.markers.target,
         filteredList = [];
 
     _.each(alignmentList, (alignment) => {

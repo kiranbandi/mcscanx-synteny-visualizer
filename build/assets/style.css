@@ -22,8 +22,21 @@
     stroke-opacity: .8;
 }
 
+.darkPlot .link:hover {
+    stroke-opacity: 0.9;
+}
+
 .markersText {
     fill: white;
     font-weight: bold;
     font-size: 1.0em;
+}
+
+.svgPLot {
+    border-radius: 1em;
+    margin-bottom: 5em;
+}
+
+.darkPlot {
+    background: #000000;
 }

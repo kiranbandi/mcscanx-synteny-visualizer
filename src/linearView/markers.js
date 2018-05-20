@@ -77,7 +77,7 @@ function drawMarkers(svg, configuration) {
 
                     return d3.schemeCategory10[i];
                 } else {
-                    return (i % 2 == 0) ? 'black' : 'grey';
+                    return (i % 2 == 0) ? '#3a3a3a' : 'grey';
                 }
             })
             .style('stroke-width', '20px')

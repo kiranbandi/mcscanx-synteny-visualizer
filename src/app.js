@@ -39,12 +39,27 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         width = plotContainer.node().clientWidth,
 
         linearViewVis = plotContainer.append('svg')
-        .attr('class', 'linearViewVis')
+        .attr('class', 'darkPlot svgPLot linearViewVis')
         // temporarily hardcoded to 500 pixels
-        .attr('height', 500)
-        .attr('width', width)
+        .attr('height', 375)
+        .attr('width', width);
+
+    // markerPositions and links are populated 
+    let linearViewConfig = {
+        'width': width,
+        'verticalPositions': {
+            'source': 50,
+            'target': 325
+        },
+        'markers': {
+            'source': [1, 2, 3, 4],
+            'target': [11, 12, 13, 14, 15]
+        },
+        'markerPositions': {},
+        'links': []
+    };
 
     displayInformation(headContainer, syntenyInformation);
-    linearView(linearViewVis, alignmentList, genomeLibrary, chromosomeMap);
+    linearView(linearViewVis, linearViewConfig, alignmentList, genomeLibrary, chromosomeMap);
 
 }
