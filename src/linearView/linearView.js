@@ -1,30 +1,11 @@
 import * as d3 from 'd3';
 import _ from 'lodash';
-import infoVisualization from './infoVisualization';
 import markerSetup from './markers';
 import linkSetup from './links';
 
-export default function(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) {
+export default function(svg, alignmentList, genomeLibrary, chromosomeMap) {
 
-    let linearViewMainContainer = d3.select("#root")
-        .append('div')
-        .attr('class', 'linearViewMainContainer'),
-
-        headContainer = linearViewMainContainer.append('div')
-        .attr('class', 'headContainer row'),
-
-        filterContainer = headContainer.append('div')
-        .attr('class', 'subContainer filterContainer col s12'),
-
-        width = linearViewMainContainer.node().clientWidth,
-
-        linearViewVis = linearViewMainContainer.append('svg')
-        .attr('class', 'linearViewVis')
-        .attr('height', width)
-        .attr('width', width)
-
-    infoVisualization(headContainer, syntenyInformation);
-
+    let width = svg.attr('width');
     // markerPositions and links are populated 
     let linearViewConfig = {
         'width': width,
@@ -34,15 +15,15 @@ export default function(syntenyInformation, alignmentList, genomeLibrary, chromo
         },
         'markers': {
             'source': [1, 2, 3, 4, 5, 6],
-            'target': [11, 12, 13, 14, 15, 16]
+            'target': [11, 12, 13, 14, 15]
         },
         'markerPositions': {},
         'links': []
     };
 
-    linearViewConfig = markerSetup(linearViewVis, linearViewConfig, chromosomeMap);
+    linearViewConfig = markerSetup(svg, linearViewConfig, chromosomeMap);
     let processedAlignmentList = filterAndFlipAlignmentList(linearViewConfig, alignmentList);
-    linkSetup(linearViewVis, linearViewConfig, processedAlignmentList, chromosomeMap, genomeLibrary);
+    linkSetup(svg, linearViewConfig, processedAlignmentList, chromosomeMap, genomeLibrary);
 }
 
 function filterAndFlipAlignmentList(linearViewConfig, alignmentList) {

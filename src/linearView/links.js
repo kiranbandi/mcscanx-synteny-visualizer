@@ -77,7 +77,7 @@ function drawLinks(svg, links, configuration) {
         .text((d) => {
             return d.alignment.source + " => " + d.alignment.target +
                 "\n type : " + d.alignment.type +
-                "\n e_value : " + d.alignment.e_value +
+                "\n E value : " + d.alignment.e_value +
                 "\n score : " + d.alignment.score +
                 "\n count : " + d.alignment.count
         });

@@ -24,7 +24,7 @@ export default function(container, information) {
         .attr('class', 'subInfoTitle')
         .text((d) => d[0] + " : " + d[1]);
 
-    let width = (graphicContainer.node().clientWidth) / 2,
+    let width = (graphicContainer.node().getBoundingClientRect().width) / 2,
         radius = width / 2;
 
     let color = d3.scaleOrdinal()
