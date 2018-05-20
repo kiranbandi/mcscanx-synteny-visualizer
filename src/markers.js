@@ -19,8 +19,8 @@ function initialiseMarkers(configuration, chromosomeCollection) {
     // find the marker list that has the maximum width
     let maxGeneticWidthMarkerList = _.maxBy(widthCollection, (o) => o.width);
     //  we use 90% of the available width for the actual markers and the remaining 10% is used as padding between the markers 
-    let scaleFactor = (configuration.width * 0.90) / maxGeneticWidthMarkerList.width,
-        markerPadding = (configuration.width * 0.10) / (configuration.markers[maxGeneticWidthMarkerList.markerId].length);
+    let scaleFactor = (configuration.width * 0.80) / maxGeneticWidthMarkerList.width,
+        markerPadding = (configuration.width * 0.20) / (configuration.markers[maxGeneticWidthMarkerList.markerId].length);
 
     // no we initialise the markers and set the width directly on the markers lists directly 
     let markers = {};
@@ -28,6 +28,7 @@ function initialiseMarkers(configuration, chromosomeCollection) {
         let widthUsedSoFar = 0,
             markerList = _.map(chromosomeList, (key, index) => {
                 let marker = {
+                        'data': chromosomeCollection.get(key),
                         'key': key,
                         // marker start point = used space + half marker padding 
                         'x': widthUsedSoFar + (markerPadding / 2),
@@ -61,31 +62,49 @@ function drawMarkers(svg, configuration) {
         .attr('class', 'markerContainer');
 
     _.map(configuration.markerPositions, (markerList, markerListId) => {
+
         markerContainer
             .selectAll('.marker-' + markerListId)
             .data(markerList)
             .enter()
             .append('line')
-            .attr('class', 'marker-' + markerListId)
+            .attr('class', 'chromosomeMarkers marker-' + markerListId)
             .style('stroke', (d, i) => {
                 if (markerListId == 'source') {
+
+                    let sourceIndex = configuration.markers.source.indexOf(d.key);
+                    return ((sourceIndex == -1) || sourceIndex > 9) ? 'black' : d3.schemeCategory10[sourceIndex];
+
                     return d3.schemeCategory10[i];
                 } else {
                     return (i % 2 == 0) ? 'black' : 'grey';
                 }
             })
-            .style('stroke-width', '7.5px')
+            .style('stroke-width', '20px')
             .style('stroke-linecap', 'round')
             .attr('x1', (d) => d.x)
             .attr('y1', configuration.verticalPositions[markerListId])
             .attr('x2', (d) => {
                 return (d.x + d.dx);
             })
-            .attr('y2', configuration.verticalPositions[markerListId]);
+            .attr('y2', configuration.verticalPositions[markerListId])
+
+        markerContainer
+            .selectAll('.marker-text-' + markerListId)
+            .data(markerList)
+            .enter()
+            .append('text')
+            .text((d) => d.data.chromosomeName)
+            .attr('class', ' markersText marker-text-' + markerListId)
+            .attr('x', function(d) {
+                return d.x + (d.dx / 2) - (this.getBoundingClientRect().width / 2);
+            })
+            .attr('y', configuration.verticalPositions[markerListId] + 5)
+
     })
 }
 
-export default function(configuration, chromosomeCollection, svg) {
+export default function(svg, configuration, chromosomeCollection) {
     configuration.markerPositions = initialiseMarkers(configuration, chromosomeCollection);
     drawMarkers(svg, configuration);
     return configuration;

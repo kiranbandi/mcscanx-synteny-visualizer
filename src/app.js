@@ -14,13 +14,12 @@ import linearView from './linearView';
 axios.get('assets/files/coordinate.gff').then(function(coordinateFile) {
     let { genomeLibrary, chromosomeMap } = processGFF(coordinateFile.data);
     // Loading the collinearity file 
-    axios.get('assets/files/collinear.collinearity').then(function(collinearFile) {
+    axios.get('assets/files/collinear_max_5_hits.collinearity').then(function(collinearFile) {
         let { information, alignmentList } = processCollinear(collinearFile.data);
         console.log('Data loading and processing complete...');
         start(information, alignmentList, genomeLibrary, chromosomeMap);
     });
 });
-
 
 function start(information, alignmentList, genomeLibrary, chromosomeMap) {
     linearView(information, alignmentList, genomeLibrary, chromosomeMap);

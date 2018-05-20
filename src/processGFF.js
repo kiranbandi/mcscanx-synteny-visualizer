@@ -8,7 +8,7 @@ export default function(gffData) {
 
         genomeEntry = line.split("\t");
         // 4 tab seperated entries , 1st in chromosome index , 2nd is unique gene id ,3rd and 4th are the start and end positions
-
+        var chromosomeName = genomeEntry[0];
         var chromosomeId = parseInt(genomeEntry[0].slice(2));
         var geneStart = parseInt(genomeEntry[2]);
         var geneEnd = parseInt(genomeEntry[3]);
@@ -20,13 +20,15 @@ export default function(gffData) {
                     'start': geneStart,
                     'end': geneEnd,
                     // the first 2 characters are the genome name and can be removed
-                    'chromosomeId': chromosomeId
+                    'chromosomeId': chromosomeId,
+                    'chromosomeName': chromosomeName
                 })
                 // To create a list of the start and end of all chromosomes
             if (!chromosomeMap.has(chromosomeId)) {
                 chromosomeMap.set(chromosomeId, {
                     start: geneStart,
-                    end: geneEnd
+                    end: geneEnd,
+                    chromosomeName
                 });
             } else {
                 var entry = chromosomeMap.get(chromosomeId);
