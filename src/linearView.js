@@ -1,10 +1,9 @@
 import * as d3 from 'd3';
 import _ from 'lodash';
 import infoVisualization from './infoVisualization';
+import markerSetup from './markers';
 
-export default function(information, alignmentList, genomeLibrary, chromosomeMap) {
-
-    let colorScale = d3.schemeCategory10;
+export default function(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) {
 
     let linearViewMainContainer = d3.select("#root")
         .append('div')
@@ -13,8 +12,8 @@ export default function(information, alignmentList, genomeLibrary, chromosomeMap
         headContainer = linearViewMainContainer.append('div')
         .attr('class', 'headContainer row'),
 
-        filterConainter = headContainer.append('div')
-        .attr('class', 'subContainer filterConainter col s12'),
+        filterContainer = headContainer.append('div')
+        .attr('class', 'subContainer filterContainer col s12'),
 
         width = linearViewMainContainer.node().clientWidth,
 
@@ -23,20 +22,29 @@ export default function(information, alignmentList, genomeLibrary, chromosomeMap
         .attr('height', width)
         .attr('width', width)
 
-    infoVisualization(headContainer, information);
+    infoVisualization(headContainer, syntenyInformation);
 
-    let sourceKeys = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
-        targetKeys = [11, 12, 13, 14, 15, 16, 17, 18, 19];
+    // markerPositions and links are populated 
+    let linearViewConfig = {
+        'width': width,
+        'verticalPositions': {
+            'source': 100,
+            'target': 350
+        },
+        'markers': {
+            'source': [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+            'target': [11, 12, 13, 14, 15, 16, 17, 18, 19]
+        },
+        'markerPositions': {},
+        'links': []
+    };
 
-    let topPosition = 100,
-        bottomPosition = 350;
+    linearViewConfig = markerSetup(linearViewConfig, chromosomeMap, linearViewVis);
 
-    let sourceMarkers = markers(linearViewVis, sourceKeys, chromosomeMap, topPosition);
-    let targetMarkers = markers(linearViewVis, targetKeys, chromosomeMap, bottomPosition);
+    let processedAlignmentList = filterAndFlipAlignmentList(linearViewConfig, alignmentList);
+    let abc = [];
 
-    let filteredAlignmentCollection = filterAlignmentList(sourceKeys, targetKeys, alignmentList);
-
-    let linksUpdated = _.map(filteredAlignmentCollection, (alignment) => {
+    let links = _.map(processedAlignmentList, (alignment) => {
 
         let firstLink = alignment.links[0];
         let lastLink = alignment.links[alignment.links.length - 1];
@@ -52,30 +60,28 @@ export default function(information, alignmentList, genomeLibrary, chromosomeMap
         let sourceChromosome = chromosomeMap.get(alignment.sourceKey);
         let targetChromosome = chromosomeMap.get(alignment.targetKey);
 
-        let sourceMarker = _.find(sourceMarkers, (o) => o.key == alignment.sourceKey);
-        let targetMarker = _.find(targetMarkers, (o) => o.key == alignment.targetKey);
+        let sourceMarker = _.find(linearViewConfig.markerPositions.source, (o) => o.key == alignment.sourceKey);
+        let targetMarker = _.find(linearViewConfig.markerPositions.target, (o) => o.key == alignment.targetKey);
 
         let sourceGeneWidth = ((sourceGenes[1] - sourceGenes[0]) / (sourceChromosome.width)) * (sourceMarker.dx / 2);
+        let targetGeneWidth = ((targetGenes[1] - targetGenes[0]) / (targetChromosome.width)) * (targetMarker.dx / 2);
         let sourceX = ((sourceGenes[0] - sourceChromosome.start) / (sourceChromosome.width)) * (sourceMarker.dx);
         let targetX = ((targetGenes[0] - targetChromosome.start) / (targetChromosome.width)) * (targetMarker.dx);
-
-        sourceGeneWidth = Math.max(sourceGeneWidth, 2);
+        // pick the one with the smaller width and ensure the minimum is 2px
+        let linkWidth = Math.max(Math.min(sourceGeneWidth, targetGeneWidth), 2);
 
         return {
-
             source: {
-                'x': sourceMarker.x + sourceX + sourceGeneWidth,
-                'y': topPosition
+                'x': sourceMarker.x + sourceX + linkWidth,
+                'y': linearViewConfig.verticalPositions.source
             },
             target: {
-                'x': targetMarker.x + targetX + sourceGeneWidth,
-                'y': bottomPosition
+                'x': targetMarker.x + targetX + linkWidth,
+                'y': linearViewConfig.verticalPositions.target
             },
             key: alignment.sourceKey,
-            width: sourceGeneWidth
+            width: linkWidth
         }
-
-
     })
 
     function link(d) {
@@ -88,9 +94,6 @@ export default function(information, alignmentList, genomeLibrary, chromosomeMap
             yi = d3.interpolateNumber(y0, y1),
             y2 = yi(0.65),
             y3 = yi(1 - 0.65);
-
-        // ToDo - nice to have - allow flow up or down! Plenty of use cases for starting at the bottom,
-        // but main one is trickle down (economics, budgets etc), not up
 
         return "M" + x0 + "," + y0 // start (of SVG path)
             +
@@ -106,7 +109,7 @@ export default function(information, alignmentList, genomeLibrary, chromosomeMap
 
     linearViewVis.append("g")
         .selectAll('.link')
-        .data(linksUpdated)
+        .data(links)
         .enter()
         .append("path")
         .attr("class", "link")
@@ -117,64 +120,46 @@ export default function(information, alignmentList, genomeLibrary, chromosomeMap
             return d.width;
         })
         .style('stroke', (d, i) => {
-            return d3.schemeCategory10[d.key - 1];
+            let sourceIndex = linearViewConfig.markers.source.indexOf(d.key);
+            return ((sourceIndex == -1) || sourceIndex > 9) ? 'black' : d3.schemeCategory10[sourceIndex];
         });
 }
 
 
-function filterAlignmentList(sourceKeys, targetKeys, alignmentList) {
-    return _.filter(alignmentList, (alignment) => {
-        let sourceAndTarget = alignment.sourceKey && alignment.targetKey && (sourceKeys.indexOf(alignment.sourceKey) > -1) && (targetKeys.indexOf(alignment.targetKey) > -1);
-        return (sourceAndTarget);
-    });
-}
+function filterAndFlipAlignmentList(linearViewConfig, alignmentList) {
 
+    let sourceKeyList = linearViewConfig.markers.source,
+        targetKeyList = linearViewConfig.markers.target,
+        filteredList = [];
 
-function markers(svgContainer, keys, chromosomeCollection, positionFromTop) {
+    _.each(alignmentList, (alignment) => {
 
-    let width = svgContainer.node().clientWidth;
-    // 90% of the total width is used for markers and the rest is used 
-    // for creating gap between the markers except for the first marker
-    let scaleFactor = (width * 0.90) / _.sumBy(keys, (key) => chromosomeCollection.get(key).width),
-        markerPaddingToLeft = (width * 0.10) / (keys.length - 1);
+        let { sourceKey, targetKey } = alignment;
 
-    // keep track of width that has been consumed to the left of the current element
-    let previousWidthStore = 0;
+        if (sourceKey && targetKey) {
+            // if the alignment is from source to target we return the alignment directly 
+            if ((sourceKeyList.indexOf(sourceKey) > -1) && (targetKeyList.indexOf(targetKey) > -1)) {
+                filteredList.push(alignment);
+            }
+            // if the alignment is from target to source we flip the alignment  
+            else if ((sourceKeyList.indexOf(targetKey) > -1) && (targetKeyList.indexOf(sourceKey) > -1)) {
 
-    let markers = _.map(keys, (key, index) => {
-        let marker = {
-            'key': key,
-            // marker start point = used space + padding of element (no padding for first element)
-            'x': previousWidthStore + (index == 0 ? 0 : markerPaddingToLeft),
-            // width of the marker
-            'dx': (scaleFactor * chromosomeCollection.get(key).width)
+                let flippedAlignment = _.clone(alignment);
+
+                flippedAlignment.source = alignment.target;
+                flippedAlignment.target = alignment.source;
+                flippedAlignment.sourceKey = alignment.targetKey;
+                flippedAlignment.targetKey = alignment.sourceKey;
+                flippedAlignment.links = _.map(alignment.links, (link) => {
+                    return {
+                        'source': link.target,
+                        'target': link.source,
+                        'e_value': link.e_value
+                    };
+                });
+                filteredList.push(flippedAlignment);
+            }
         }
-        previousWidthStore = marker.x + marker.dx;
-        return marker;
-    })
-
-    let markerContainer = svgContainer
-        .append('g')
-        .attr('class', 'markerContainer-new')
-
-    let chromosomeMarkers = markerContainer
-        .selectAll('.marker')
-        .data(markers)
-        .enter()
-        .append('line')
-        .attr('class', 'marker')
-        .style('stroke', (d, i) => {
-            return d3.schemeCategory10[i];
-        })
-        .style('stroke-width', '7.5px')
-        .style('stroke-linecap', 'round')
-        .attr('x1', (d) => d.x)
-        .attr('y1', positionFromTop)
-        .attr('x2', (d) => {
-            return (d.x + d.dx);
-        })
-        .attr('y2', positionFromTop);
-
-    return markers;
-
+    });
+    return filteredList;
 }

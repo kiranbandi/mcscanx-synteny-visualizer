@@ -1,4 +1,5 @@
 export default function(gffData) {
+
     var genomeEntry,
         genomeLibrary = new Map(),
         chromosomeMap = new Map();
