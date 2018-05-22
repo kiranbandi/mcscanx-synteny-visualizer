@@ -40,3 +40,16 @@
 .darkPlot {
     background: #000000;
 }
+
+.filterContainer .select-wrapper input.select-dropdown {
+    width: 95%;
+}
+
+.filterheader {
+    margin-bottom: 1em;
+    margin-top: 1em;
+}
+
+.darkThemeLabel {
+    font-size: 1.5em;
+}

@@ -59,7 +59,7 @@ function drawMarkers(svg, configuration) {
 
     let markerContainer = d3.select('.markerContainer');
 
-    // intialise container if the markers are being drawn for the first time
+    // if container doesnt exist create it 
     if (!markerContainer.node()) {
         markerContainer = svg
             .append('g')
@@ -68,15 +68,23 @@ function drawMarkers(svg, configuration) {
 
     _.map(configuration.markerPositions, (markerList, markerListId) => {
 
-        markerContainer
+        let markerLines = markerContainer
             .selectAll('.marker-' + markerListId)
-            .data(markerList)
+            .data(markerList);
+
+        markerLines.exit().remove();
+
+        markerLines = markerLines
             .enter()
             .append('line')
-            .attr('class', 'chromosomeMarkers marker-' + markerListId)
+            .merge(markerLines)
+            .transition()
+            .duration(500)
+            .attr('class', (d, i) => {
+                return 'chromosomeMarkers marker-' + markerListId + " marker-" + markerListId + "-" + d.key;
+            })
             .style('stroke', (d, i) => {
                 if (markerListId == 'source') {
-
                     let sourceIndex = configuration.markers.source.indexOf(d.key);
                     return ((sourceIndex == -1) || sourceIndex > 9) ? 'black' : d3.schemeCategory10[sourceIndex];
 
@@ -92,21 +100,28 @@ function drawMarkers(svg, configuration) {
             .attr('x2', (d) => {
                 return (d.x + d.dx);
             })
-            .attr('y2', configuration.verticalPositions[markerListId])
+            .attr('y2', configuration.verticalPositions[markerListId]);
 
-        markerContainer
+
+        let markerTextUnits = markerContainer
             .selectAll('.marker-text-' + markerListId)
-            .data(markerList)
-            .enter()
+            .data(markerList);
+
+        markerTextUnits.exit().remove();
+
+        markerTextUnits = markerTextUnits.enter()
             .append('text')
+            .merge(markerTextUnits)
             .text((d) => d.data.chromosomeName)
             .attr('class', ' markersText marker-text-' + markerListId)
+            .transition()
+            .duration(500)
             .attr('x', function(d) {
                 return d.x + (d.dx / 2) - (this.getBoundingClientRect().width / 2);
             })
             .attr('y', configuration.verticalPositions[markerListId] + 5)
-
     })
+
 }
 
 export default function(svg, configuration, chromosomeCollection) {

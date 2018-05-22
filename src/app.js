@@ -4,6 +4,7 @@ import processGFF from './processGFF';
 import processCollinear from './processCollinear';
 import linearView from './linearView/linearView';
 import displayInformation from './displayInformation';
+import filterPanel from './filterPanel';
 
 // Load the Data gff file and syteny collinearity file 
 // Parse the Data and store it in appropriate data structures 
@@ -25,21 +26,17 @@ axios.get('assets/files/coordinate.gff').then(function(coordinateFile) {
 
 function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) {
 
-
-    let plotContainer = d3.select("#root")
+    let rootContainer = d3.select("#root")
         .append('div')
-        .attr('class', 'plotContainer'),
+        .attr('class', 'rootContainer'),
 
-        headContainer = plotContainer.append('div')
+        headContainer = rootContainer.append('div')
         .attr('class', 'headContainer row'),
 
-        filterContainer = headContainer.append('div')
-        .attr('class', 'subContainer filterContainer col s12'),
+        width = rootContainer.node().clientWidth,
 
-        width = plotContainer.node().clientWidth,
-
-        linearViewVis = plotContainer.append('svg')
-        .attr('class', 'darkPlot svgPLot linearViewVis')
+        linearViewVis = rootContainer.append('svg')
+        .attr('class', 'svgPLot linearViewVis')
         // temporarily hardcoded to 500 pixels
         .attr('height', 375)
         .attr('width', width);
@@ -61,11 +58,20 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
 
     displayInformation(headContainer, syntenyInformation);
 
+    let filterContainer = headContainer.append('div')
+        .attr('class', 'subContainer filterContainer col s12 center-align');
+
+    filterPanel(filterContainer, linearViewConfig, chromosomeMap, function(selectedMarkers, isDarkTheme, isDotPlot) {
+        linearViewConfig.markers = selectedMarkers;
+        let updatedAlignmentList = filterAndFlipAlignmentList(linearViewConfig.markers, alignmentList);
+        linearView(linearViewVis, linearViewConfig, updatedAlignmentList, genomeLibrary, chromosomeMap);
+        linearViewVis.classed('darkPlot', isDarkTheme);
+    });
 
     let processedAlignmentList = filterAndFlipAlignmentList(linearViewConfig.markers, alignmentList);
-
     linearView(linearViewVis, linearViewConfig, processedAlignmentList, genomeLibrary, chromosomeMap);
 }
+
 
 function filterAndFlipAlignmentList(markers, alignmentList) {
 

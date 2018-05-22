@@ -65,11 +65,16 @@ function drawLinks(svg, links, configuration) {
 
     // stroke width takes half the width so we draw a line and depending on the width needed offset the x position 
     // so that x is reduced by half of the intended width :-)
-    linkContainer
+    let genomicLinks = linkContainer
         .selectAll('.link')
-        .data(links)
+        .data(links);
+
+    genomicLinks.exit().remove();
+
+    genomicLinks = genomicLinks
         .enter()
         .append("path")
+        .merge(genomicLinks)
         .attr("class", "link")
         .attr("d", function(d) {
             return createLinkPath(d);

@@ -5453,8 +5453,7 @@ button.btn-floating {
     text-align: left
 }
 
-.dropdown-content li:hover,
-.dropdown-content li.active {
+.dropdown-content li:hover {
     background-color: #eee
 }
 
