@@ -57,9 +57,14 @@ function initialiseMarkers(configuration, chromosomeCollection) {
 
 function drawMarkers(svg, configuration) {
 
-    let markerContainer = svg
-        .append('g')
-        .attr('class', 'markerContainer');
+    let markerContainer = d3.select('.markerContainer');
+
+    // intialise container if the markers are being drawn for the first time
+    if (!markerContainer.node()) {
+        markerContainer = svg
+            .append('g')
+            .attr('class', 'markerContainer');
+    }
 
     _.map(configuration.markerPositions, (markerList, markerListId) => {
 

@@ -53,10 +53,19 @@ function initialiseLinks(configuration, alignmentList, genomeLibrary, chromosome
 
 
 function drawLinks(svg, links, configuration) {
+
+    let linkContainer = d3.select('.linkContainer');
+
+    // intialise container if the markers are being drawn for the first time
+    if (!linkContainer.node()) {
+        linkContainer = svg
+            .append('g')
+            .attr('class', 'linkContainer');
+    }
+
     // stroke width takes half the width so we draw a line and depending on the width needed offset the x position 
     // so that x is reduced by half of the intended width :-)
-    svg.append("g")
-        .attr('class', 'linkContainer')
+    linkContainer
         .selectAll('.link')
         .data(links)
         .enter()
