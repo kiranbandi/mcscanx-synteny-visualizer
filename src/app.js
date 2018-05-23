@@ -5,7 +5,9 @@ import processCollinear from './processCollinear';
 import linearView from './linearView/linearView';
 import displayInformation from './displayInformation';
 import filterPanel from './filterPanel';
+import processAlignment from './filterAlignments';
 
+/* GOLDEN RULES written by ancient druid - do not alter ¯\_(ツ)_/¯  */
 // Load the Data gff file and syteny collinearity file 
 // Parse the Data and store it in appropriate data structures 
 // Filter it for useful information and mine it to decide on what to represent 
@@ -41,8 +43,9 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         .attr('height', 375)
         .attr('width', width);
 
-    // markerPositions and links are populated 
-    let linearViewConfig = {
+    // markerPositions and links are populated  
+    // need to reconfigure seperately for each plot indivually at some point in the not so far future
+    let configuration = {
         'width': width,
         'verticalPositions': {
             'source': 50,
@@ -61,52 +64,13 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
     let filterContainer = headContainer.append('div')
         .attr('class', 'subContainer filterContainer col s12 center-align');
 
-    filterPanel(filterContainer, linearViewConfig, chromosomeMap, function(selectedMarkers, isDarkTheme, isDotPlot) {
-        linearViewConfig.markers = selectedMarkers;
-        let updatedAlignmentList = filterAndFlipAlignmentList(linearViewConfig.markers, alignmentList);
-        linearView(linearViewVis, linearViewConfig, updatedAlignmentList, genomeLibrary, chromosomeMap);
+    filterPanel(filterContainer, configuration, chromosomeMap, function(selectedMarkers, isDarkTheme, isDotPlot) {
+        configuration.markers = selectedMarkers;
+        let updatedAlignmentList = processAlignment(configuration.markers, alignmentList);
+        linearView(linearViewVis, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
         linearViewVis.classed('darkPlot', isDarkTheme);
     });
 
-    let processedAlignmentList = filterAndFlipAlignmentList(linearViewConfig.markers, alignmentList);
-    linearView(linearViewVis, linearViewConfig, processedAlignmentList, genomeLibrary, chromosomeMap);
-}
-
-
-function filterAndFlipAlignmentList(markers, alignmentList) {
-
-    let sourceKeyList = markers.source,
-        targetKeyList = markers.target,
-        filteredList = [];
-
-    _.each(alignmentList, (alignment) => {
-
-        let { sourceKey, targetKey } = alignment;
-
-        if (sourceKey && targetKey) {
-            // if the alignment is from source to target we return the alignment directly 
-            if ((sourceKeyList.indexOf(sourceKey) > -1) && (targetKeyList.indexOf(targetKey) > -1)) {
-                filteredList.push(alignment);
-            }
-            // if the alignment is from target to source we flip the alignment  
-            else if ((sourceKeyList.indexOf(targetKey) > -1) && (targetKeyList.indexOf(sourceKey) > -1)) {
-
-                let flippedAlignment = _.clone(alignment);
-
-                flippedAlignment.source = alignment.target;
-                flippedAlignment.target = alignment.source;
-                flippedAlignment.sourceKey = alignment.targetKey;
-                flippedAlignment.targetKey = alignment.sourceKey;
-                flippedAlignment.links = _.map(alignment.links, (link) => {
-                    return {
-                        'source': link.target,
-                        'target': link.source,
-                        'e_value': link.e_value
-                    };
-                });
-                filteredList.push(flippedAlignment);
-            }
-        }
-    });
-    return filteredList;
+    let processedAlignmentList = processAlignment(configuration.markers, alignmentList);
+    linearView(linearViewVis, configuration, processedAlignmentList, genomeLibrary, chromosomeMap);
 }

@@ -86,7 +86,7 @@ function drawLinks(svg, links, configuration) {
         })
         .style('stroke', (d, i) => {
             let sourceIndex = configuration.markers.source.indexOf(d.alignment.sourceKey);
-            return ((sourceIndex == -1) || sourceIndex > 9) ? 'black' : d3.schemeCategory10[sourceIndex];
+            return ((sourceIndex == -1) || sourceIndex > 9) ? '#808080' : d3.schemeCategory10[sourceIndex];
         })
         // title is an SVG standard way of providing tooltips, up to the browser how to render this, so changing the style is tricky
         .append('title')

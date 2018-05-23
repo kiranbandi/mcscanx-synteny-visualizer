@@ -18,14 +18,15 @@ function initialiseMarkers(configuration, chromosomeCollection) {
 
     // find the marker list that has the maximum width
     let maxGeneticWidthMarkerList = _.maxBy(widthCollection, (o) => o.width);
+
     //  we use 90% of the available width for the actual markers and the remaining 10% is used as padding between the markers 
-    let scaleFactor = (configuration.width * 0.80) / maxGeneticWidthMarkerList.width,
-        markerPadding = (configuration.width * 0.20) / (configuration.markers[maxGeneticWidthMarkerList.markerId].length);
+    let scaleFactor = (configuration.width * 0.80) / maxGeneticWidthMarkerList.width;
 
     // no we initialise the markers and set the width directly on the markers lists directly 
     let markers = {};
     _.each(configuration.markers, (chromosomeList, markerId) => {
-        let widthUsedSoFar = 0,
+        let markerPadding = (configuration.width * 0.20) / (chromosomeList.length),
+            widthUsedSoFar = 0,
             markerList = _.map(chromosomeList, (key, index) => {
                 let marker = {
                         'data': chromosomeCollection.get(key),
@@ -78,8 +79,8 @@ function drawMarkers(svg, configuration) {
             .enter()
             .append('line')
             .merge(markerLines)
-            .on('mouseover', markerHover)
-            .on('mouseout', markerOut)
+            .on('mouseover', markerHover.bind({ markerListId }))
+            .on('mouseout', markerOut.bind({ markerListId }))
             .transition()
             .duration(500)
             .attr('class', (d, i) => {
@@ -88,7 +89,7 @@ function drawMarkers(svg, configuration) {
             .style('stroke', (d, i) => {
                 if (markerListId == 'source') {
                     let sourceIndex = configuration.markers.source.indexOf(d.key);
-                    return ((sourceIndex == -1) || sourceIndex > 9) ? 'black' : d3.schemeCategory10[sourceIndex];
+                    return ((sourceIndex == -1) || sourceIndex > 9) ? '#808080' : d3.schemeCategory10[sourceIndex];
 
                     return d3.schemeCategory10[i];
                 } else {
@@ -97,7 +98,9 @@ function drawMarkers(svg, configuration) {
             })
             .style('stroke-width', '20px')
             .style('stroke-linecap', 'round')
-            .attr('x1', (d) => d.x)
+            .attr('x1', (d) => {
+                return d.x;
+            })
             .attr('y1', configuration.verticalPositions[markerListId])
             .attr('x2', (d) => {
                 return (d.x + d.dx);
@@ -116,8 +119,8 @@ function drawMarkers(svg, configuration) {
             .merge(markerTextUnits)
             .text((d) => d.data.chromosomeName)
             .attr('class', ' markersText marker-text-' + markerListId)
-            .on('mouseover', markerHover)
-            .on('mouseout', markerOut)
+            .on('mouseover', markerHover.bind({ markerListId }))
+            .on('mouseout', markerOut.bind({ markerListId }))
             .transition()
             .duration(500)
             .attr('x', function(d) {
@@ -129,15 +132,19 @@ function drawMarkers(svg, configuration) {
 }
 
 function markerHover(d) {
-    d3.selectAll(".link")
-        .classed('hiddenLink', true);
-    d3.selectAll('.link-source-' + d.key)
-        .classed('activeLink', true);
+    if (this.markerListId == 'source') {
+        d3.selectAll(".link")
+            .classed('hiddenLink', true);
+        d3.selectAll('.link-source-' + d.key)
+            .classed('activeLink', true);
+    }
 }
 
 function markerOut(d) {
-    d3.selectAll('.hiddenLink').classed('hiddenLink', false);
-    d3.selectAll('.activeLink').classed('activeLink', false);
+    if (this.markerListId == 'source') {
+        d3.selectAll('.hiddenLink').classed('hiddenLink', false);
+        d3.selectAll('.activeLink').classed('activeLink', false);
+    }
 }
 
 export default function(svg, configuration, chromosomeCollection) {
