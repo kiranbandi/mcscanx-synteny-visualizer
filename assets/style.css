@@ -12,8 +12,8 @@
     font-weight: bold;
 }
 
-.chromosomeMarkers,
-.markersText {
+.marker-source,
+.marker-text-source {
     cursor: pointer;
 }
 
