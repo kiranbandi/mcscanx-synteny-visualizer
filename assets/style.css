@@ -45,11 +45,6 @@
     font-size: 1.0em;
 }
 
-.svgPLot {
-    border-radius: 1em;
-    margin-bottom: 5em;
-}
-
 .darkPlot {
     background: #000000;
 }
@@ -65,4 +60,22 @@
 
 .darkThemeLabel {
     font-size: 1.5em;
+}
+
+.dotViewVis,
+.linearViewVis {
+    margin: 20px auto 100px auto;
+    display: block;
+    border-radius: 1em;
+}
+
+.dot-plot-markers {
+    fill: grey;
+    font-weight: bold;
+    font-size: 1.0em;
+}
+
+.alignment-link-lines {
+    opacity: 0.5;
+    cursor: pointer;
 }
