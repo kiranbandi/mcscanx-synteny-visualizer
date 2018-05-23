@@ -75,7 +75,9 @@ function drawLinks(svg, links, configuration) {
         .enter()
         .append("path")
         .merge(genomicLinks)
-        .attr("class", "link")
+        .attr("class", (d) => {
+            return 'link ' + " link-source-" + d.alignment.sourceKey;
+        })
         .attr("d", function(d) {
             return createLinkPath(d);
         })

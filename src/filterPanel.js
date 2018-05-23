@@ -13,7 +13,7 @@ export default function(container, configuration, chromosomeMap, callback) {
     let sourceSelect = sourceSelectContainer
         .append("select")
         .attr('class', 'sourceSelect')
-        // null doesnt work but an empty string works when setting only one attribute
+        // null doesnt work but an empty string works when setting only one attribute because d3 is ¯\_(ツ)_/¯
         .attr('multiple', '');
 
     sourceSelect.append('option')
@@ -67,11 +67,11 @@ export default function(container, configuration, chromosomeMap, callback) {
         .text('Target Chromosomes');
 
     let themeAndPlotOptionContainer = container.append('div')
-        .attr('class', 'themeAndPlotOptionContainer col m6 l4');
+        .attr('class', 'themeAndPlotOptionContainer col m6 l5');
 
     themeAndPlotOptionContainer.append('h4')
         .attr('class', 'col s3')
-        .style('font-size', '1.5em')
+        .style('font-size', '1.4em')
         .text('Dark Theme')
 
     themeAndPlotOptionContainer.append('div')
@@ -81,7 +81,7 @@ export default function(container, configuration, chromosomeMap, callback) {
 
     themeAndPlotOptionContainer.append('h4')
         .attr('class', 'col s3')
-        .style('font-size', '1.5em')
+        .style('font-size', '1.4em')
         .text('Plot Type')
 
     themeAndPlotOptionContainer.append('div')
@@ -93,10 +93,11 @@ export default function(container, configuration, chromosomeMap, callback) {
         targetSelectInstance = M.FormSelect.init(document.querySelector('.targetSelectContainer select'), { 'classes': 'chromosomeSelect', dropdownOptions: {} });
 
     let generateButtonContainer = container.append('div')
-        .attr('class', 'generateButtonContainer col m6 l2 ')
+        .attr('class', 'generateButtonContainer col m6 l1 ')
         .append('a')
-        .attr('class', 'waves-effect waves-light btn btn-large')
-        .html('<i class="material-icons right">cached</i>GENERATE')
+        .style('margin-top', '1em')
+        .attr('class', 'waves-effect waves-light btn')
+        .html('<i class="material-icons right">cached</i>GO')
         .on('click', () => {
             callback({
                 'source': _.map(sourceSelectInstance.getSelectedValues(), (o) => Number(o)),

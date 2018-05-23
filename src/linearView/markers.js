@@ -78,6 +78,8 @@ function drawMarkers(svg, configuration) {
             .enter()
             .append('line')
             .merge(markerLines)
+            .on('mouseover', markerHover)
+            .on('mouseout', markerOut)
             .transition()
             .duration(500)
             .attr('class', (d, i) => {
@@ -100,7 +102,7 @@ function drawMarkers(svg, configuration) {
             .attr('x2', (d) => {
                 return (d.x + d.dx);
             })
-            .attr('y2', configuration.verticalPositions[markerListId]);
+            .attr('y2', configuration.verticalPositions[markerListId])
 
 
         let markerTextUnits = markerContainer
@@ -114,14 +116,28 @@ function drawMarkers(svg, configuration) {
             .merge(markerTextUnits)
             .text((d) => d.data.chromosomeName)
             .attr('class', ' markersText marker-text-' + markerListId)
+            .on('mouseover', markerHover)
+            .on('mouseout', markerOut)
             .transition()
             .duration(500)
             .attr('x', function(d) {
                 return d.x + (d.dx / 2) - (this.getBoundingClientRect().width / 2);
             })
-            .attr('y', configuration.verticalPositions[markerListId] + 5)
+            .attr('y', configuration.verticalPositions[markerListId] + 5);
     })
 
+}
+
+function markerHover(d) {
+    d3.selectAll(".link")
+        .classed('hiddenLink', true);
+    d3.selectAll('.link-source-' + d.key)
+        .classed('activeLink', true);
+}
+
+function markerOut(d) {
+    d3.selectAll('.hiddenLink').classed('hiddenLink', false);
+    d3.selectAll('.activeLink').classed('activeLink', false);
 }
 
 export default function(svg, configuration, chromosomeCollection) {
