@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import axios from 'axios';
 import processGFF from './processGFF';
+import processComplexGFF from './processComplexGFF';
 import processCollinear from './processCollinear';
 import linearView from './linearView/linearView';
 import dotView from './dotView/dotView';
@@ -34,6 +35,9 @@ let sourceName = getParams(window.location.search).source || 'bn';
 // Loading the gff file 
 axios.get('assets/files/' + sourceName + '_coordinate.gff').then(function(coordinateFile) {
     let { genomeLibrary, chromosomeMap } = processGFF(coordinateFile.data);
+
+    processComplexGFF(coordinateFile.data);
+
     // Loading the collinearity file 
     axios.get('assets/files/' + sourceName + '_collinear.collinearity').then(function(collinearFile) {
         let { information, alignmentList } = processCollinear(collinearFile.data);
