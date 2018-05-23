@@ -25,7 +25,9 @@ function initialiseMarkers(configuration, chromosomeCollection) {
     // no we initialise the markers and set the width directly on the markers lists directly 
     let markers = {};
     _.each(configuration.markers, (chromosomeList, markerId) => {
-        let markerPadding = (configuration.width * 0.20) / (chromosomeList.length),
+        // the remaining width is 20% for the maximum width marker list but will change for others
+        let remainingWidth = (configuration.width - (_.find(widthCollection, (o) => o.markerId == markerId).width * scaleFactor)),
+            markerPadding = remainingWidth / (chromosomeList.length),
             widthUsedSoFar = 0,
             markerList = _.map(chromosomeList, (key, index) => {
                 let marker = {
@@ -40,17 +42,6 @@ function initialiseMarkers(configuration, chromosomeCollection) {
                 widthUsedSoFar = marker.x + marker.dx + (markerPadding / 2);
                 return marker;
             })
-
-        // for marker lists that dont use the full width which is basically every marker list other than the one with the maximum genetic width we 
-        //  align them to the center of the screen to make things look more presentable - faaaaancy but meh !
-        // we do this by finding the remaining width and then dividing that by half and adding this to the x for each the marker in the lists we want center aligned
-        if (maxGeneticWidthMarkerList.markerId != markerId) {
-            let paddingToleft = (configuration.width - widthUsedSoFar) / 2;
-            markerList = _.map(markerList, (marker) => {
-                marker.x = marker.x + paddingToleft;
-                return marker;
-            })
-        }
         markers[markerId] = markerList;
     })
     return markers;
@@ -121,8 +112,6 @@ function drawMarkers(svg, configuration) {
             .attr('class', ' markersText marker-text-' + markerListId)
             .on('mouseover', markerHover.bind({ markerListId }))
             .on('mouseout', markerOut.bind({ markerListId }))
-            .transition()
-            .duration(500)
             .attr('x', function(d) {
                 return d.x + (d.dx / 2) - (this.getBoundingClientRect().width / 2);
             })

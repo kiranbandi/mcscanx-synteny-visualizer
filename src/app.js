@@ -3,6 +3,7 @@ import axios from 'axios';
 import processGFF from './processGFF';
 import processCollinear from './processCollinear';
 import linearView from './linearView/linearView';
+import dotView from './dotView/dotView';
 import displayInformation from './displayInformation';
 import filterPanel from './filterPanel';
 import processAlignment from './filterAlignments';
@@ -19,7 +20,7 @@ import processAlignment from './filterAlignments';
 axios.get('assets/files/coordinate.gff').then(function(coordinateFile) {
     let { genomeLibrary, chromosomeMap } = processGFF(coordinateFile.data);
     // Loading the collinearity file 
-    axios.get('assets/files/collinear_max_5_hits.collinearity').then(function(collinearFile) {
+    axios.get('assets/files/collinear.collinearity').then(function(collinearFile) {
         let { information, alignmentList } = processCollinear(collinearFile.data);
         console.log('Data loading and processing complete...');
         start(information, alignmentList, genomeLibrary, chromosomeMap);
@@ -36,12 +37,19 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         .attr('class', 'headContainer row'),
 
         width = rootContainer.node().clientWidth,
+        dotViewWidth = Math.min(width, 750),
 
         linearViewVis = rootContainer.append('svg')
-        .attr('class', 'svgPLot linearViewVis')
+        .attr('class', 'linearViewVis')
         // temporarily hardcoded to 500 pixels
-        .attr('height', 375)
+        .attr('height', 400)
         .attr('width', width);
+
+    let dotViewVis = rootContainer.append('svg')
+        .attr('class', 'dotViewVis hide')
+        // temporarily hardcoded to 500 pixels
+        .attr('height', dotViewWidth)
+        .attr('width', dotViewWidth);
 
     // markerPositions and links are populated  
     // need to reconfigure seperately for each plot indivually at some point in the not so far future
@@ -49,14 +57,17 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         'width': width,
         'verticalPositions': {
             'source': 50,
-            'target': 325
+            'target': 375
         },
         'markers': {
-            'source': [1, 2, 3, 4],
-            'target': [11, 12, 13, 14, 15]
+            'source': [1],
+            'target': [11]
         },
         'markerPositions': {},
-        'links': []
+        'links': [],
+        'dotView': {
+            'width': dotViewWidth
+        }
     };
 
     displayInformation(headContainer, syntenyInformation);
@@ -65,10 +76,21 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         .attr('class', 'subContainer filterContainer col s12 center-align');
 
     filterPanel(filterContainer, configuration, chromosomeMap, function(selectedMarkers, isDarkTheme, isDotPlot) {
+        //  hadle theming 
+        linearViewVis.classed('darkPlot', isDarkTheme);
+        dotViewVis.classed('darkPlot', isDarkTheme);
+        // show hide plots based on options
+        linearViewVis.classed('hide', isDotPlot);
+        dotViewVis.classed('hide', !isDotPlot);
+        // filter markers
         configuration.markers = selectedMarkers;
         let updatedAlignmentList = processAlignment(configuration.markers, alignmentList);
-        linearView(linearViewVis, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
-        linearViewVis.classed('darkPlot', isDarkTheme);
+        // call plot functions depending on the options
+        if (isDotPlot) {
+            dotView(dotViewVis, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
+        } else {
+            linearView(linearViewVis, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
+        }
     });
 
     let processedAlignmentList = processAlignment(configuration.markers, alignmentList);

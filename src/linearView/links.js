@@ -100,6 +100,7 @@ function drawLinks(svg, links, configuration) {
 }
 
 function createLinkPath(d) {
+
     let curvature = 0.65;
     // code block sourced from d3-sankey https://github.com/d3/d3-sankey for drawing curved blocks
     var x0 = d.source.x,
