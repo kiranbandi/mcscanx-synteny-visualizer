@@ -16,11 +16,26 @@ import processAlignment from './filterAlignments';
 // Refine the plots 
 // Add interactivity to the plots 
 
+const getParams = query => {
+    if (!query) {
+        return {};
+    }
+    return (/^[?#]/.test(query) ? query.slice(1) : query)
+        .split('&')
+        .reduce((params, param) => {
+            let [key, value] = param.split('=');
+            params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
+            return params;
+        }, {});
+};
+
+let sourceName = getParams(window.location.search).source || 'bn';
+
 // Loading the gff file 
-axios.get('assets/files/coordinate.gff').then(function(coordinateFile) {
+axios.get('assets/files/' + sourceName + '_coordinate.gff').then(function(coordinateFile) {
     let { genomeLibrary, chromosomeMap } = processGFF(coordinateFile.data);
     // Loading the collinearity file 
-    axios.get('assets/files/collinear.collinearity').then(function(collinearFile) {
+    axios.get('assets/files/' + sourceName + '_collinear.collinearity').then(function(collinearFile) {
         let { information, alignmentList } = processCollinear(collinearFile.data);
         console.log('Data loading and processing complete...');
         start(information, alignmentList, genomeLibrary, chromosomeMap);
@@ -60,8 +75,8 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
             'target': 375
         },
         'markers': {
-            'source': [1],
-            'target': [11]
+            'source': [1, 2, 3],
+            'target': [4, 5]
         },
         'markerPositions': {},
         'links': [],

@@ -48,6 +48,6 @@ export default function(gffData) {
     chromosomeMap.forEach((chromosome) => {
         chromosome.width = chromosome.end - chromosome.start;
     })
-
+    console.log(chromosomeMap);
     return { genomeLibrary, chromosomeMap };
 };
