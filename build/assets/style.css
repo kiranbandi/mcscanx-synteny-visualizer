@@ -1,3 +1,12 @@
+html,
+body {
+    height: 100%;
+}
+
+.container {
+    min-height: 95%;
+}
+
 .subInfoTitle {
     font-weight: bold;
     text-transform: capitalize;
@@ -64,7 +73,7 @@
 
 .dotViewVis,
 .linearViewVis {
-    margin: 20px auto 100px auto;
+    margin: 20px auto 40px auto;
     display: block;
     border-radius: 1em;
 }
@@ -78,4 +87,8 @@
 .alignment-link-lines {
     opacity: 0.5;
     cursor: pointer;
+}
+
+.footer-link {
+    color: #38e346
 }
