@@ -108,7 +108,7 @@ function drawMarkers(svg, configuration) {
         markerTextUnits = markerTextUnits.enter()
             .append('text')
             .merge(markerTextUnits)
-            .text((d) => d.data.chromosomeName)
+            .text((d) => d.key)
             .attr('class', ' markersText marker-text-' + markerListId)
             .on('mouseover', markerHover.bind({ markerListId }))
             .on('mouseout', markerOut.bind({ markerListId }))

@@ -22,11 +22,11 @@ function initialiseLinks(configuration, alignmentList, genomeLibrary, chromosome
             targetGenes[value] = genomeLibrary.get(targetGenes[value]).start;
         })
 
-        let sourceChromosome = chromosomeMap.get(alignment.sourceKey),
-            targetChromosome = chromosomeMap.get(alignment.targetKey);
+        let sourceChromosome = chromosomeMap.get(alignment.source),
+            targetChromosome = chromosomeMap.get(alignment.target);
 
-        let sourceMarker = _.find(configuration.markerPositions.source, (o) => o.key == alignment.sourceKey),
-            targetMarker = _.find(configuration.markerPositions.target, (o) => o.key == alignment.targetKey);
+        let sourceMarker = _.find(configuration.markerPositions.source, (o) => o.key == alignment.source),
+            targetMarker = _.find(configuration.markerPositions.target, (o) => o.key == alignment.target);
 
         let sourceGeneWidth = ((sourceGenes[1] - sourceGenes[0]) / (sourceChromosome.width)) * (sourceMarker.dx / 2),
             targetGeneWidth = ((targetGenes[1] - targetGenes[0]) / (targetChromosome.width)) * (targetMarker.dx / 2),
@@ -76,7 +76,7 @@ function drawLinks(svg, links, configuration) {
         .append("path")
         .merge(genomicLinks)
         .attr("class", (d) => {
-            return 'link ' + " link-source-" + d.alignment.sourceKey;
+            return 'link ' + " link-source-" + d.alignment.source;
         })
         .attr("d", function(d) {
             return createLinkPath(d);
@@ -85,7 +85,7 @@ function drawLinks(svg, links, configuration) {
             return d.width;
         })
         .style('stroke', (d, i) => {
-            let sourceIndex = configuration.markers.source.indexOf(d.alignment.sourceKey);
+            let sourceIndex = configuration.markers.source.indexOf(d.alignment.source);
             return ((sourceIndex == -1) || sourceIndex > 9) ? '#808080' : d3.schemeCategory10[sourceIndex];
         })
         // title is an SVG standard way of providing tooltips, up to the browser how to render this, so changing the style is tricky

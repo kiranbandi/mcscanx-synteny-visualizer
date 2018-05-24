@@ -1,13 +1,13 @@
 import * as d3 from 'd3';
 import axios from 'axios';
 import processGFF from './processGFF';
-import processComplexGFF from './processComplexGFF';
 import processCollinear from './processCollinear';
 import linearView from './linearView/linearView';
 import dotView from './dotView/dotView';
 import displayInformation from './displayInformation';
 import filterPanel from './filterPanel';
 import processAlignment from './filterAlignments';
+import { sampleSourceMapper } from './sampleSourceMapper';
 
 /* GOLDEN RULES written by ancient druid - do not alter ¯\_(ツ)_/¯  */
 // Load the Data gff file and syteny collinearity file 
@@ -35,8 +35,6 @@ let sourceName = getParams(window.location.search).source || 'bn';
 // Loading the gff file 
 axios.get('assets/files/' + sourceName + '_coordinate.gff').then(function(coordinateFile) {
     let { genomeLibrary, chromosomeMap } = processGFF(coordinateFile.data);
-
-    processComplexGFF(coordinateFile.data);
 
     // Loading the collinearity file 
     axios.get('assets/files/' + sourceName + '_collinear.collinearity').then(function(collinearFile) {
@@ -78,10 +76,7 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
             'source': 50,
             'target': 375
         },
-        'markers': {
-            'source': [1, 2, 3],
-            'target': [4, 5]
-        },
+        'markers': sampleSourceMapper[sourceName],
         'markerPositions': {},
         'links': [],
         'dotView': {
@@ -95,6 +90,7 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         .attr('class', 'subContainer filterContainer col s12 center-align');
 
     filterPanel(filterContainer, configuration, chromosomeMap, function(selectedMarkers, isDarkTheme, isDotPlot) {
+
         //  hadle theming 
         linearViewVis.classed('darkPlot', isDarkTheme);
         dotViewVis.classed('darkPlot', isDarkTheme);

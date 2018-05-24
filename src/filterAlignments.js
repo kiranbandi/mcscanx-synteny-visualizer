@@ -6,15 +6,15 @@ export default function(markers, alignmentList) {
 
     _.each(alignmentList, (alignment) => {
 
-        let { sourceKey, targetKey } = alignment;
+        let { source, target } = alignment;
 
-        if (sourceKey && targetKey) {
+        if (source && target) {
             // if the alignment is from source to target we return the alignment directly 
-            if ((sourceKeyList.indexOf(sourceKey) > -1) && (targetKeyList.indexOf(targetKey) > -1)) {
+            if ((sourceKeyList.indexOf(source) > -1) && (targetKeyList.indexOf(target) > -1)) {
                 filteredList.push(alignment);
             }
             // if the alignment is from target to source we flip the alignment  
-            else if ((sourceKeyList.indexOf(targetKey) > -1) && (targetKeyList.indexOf(sourceKey) > -1)) {
+            else if ((sourceKeyList.indexOf(target) > -1) && (targetKeyList.indexOf(source) > -1)) {
 
                 let flippedAlignment = _.clone(alignment);
 

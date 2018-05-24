@@ -22,12 +22,12 @@ export default function(container, configuration, chromosomeMap, callback) {
         .text('Select Chromosomes');
 
     sourceSelect.selectAll('.sourceOption')
-        .data([...chromosomeMap].sort((a, b) => a[0] - b[0]))
+        .data([...chromosomeMap].sort(sortAlphaNum))
         .enter()
         .append('option')
         .attr('class', 'sourceOption')
         .attr('value', (d) => d[0])
-        .text((d) => d[1].chromosomeName)
+        .text((d) => d[0])
         .filter((d) => {
             return configuration.markers.source.indexOf(d[0]) > -1;
         })
@@ -51,12 +51,12 @@ export default function(container, configuration, chromosomeMap, callback) {
         .text('Select Chromosomes');
 
     targetSelect.selectAll('.sourceOption')
-        .data([...chromosomeMap].sort((a, b) => a[0] - b[0]))
+        .data([...chromosomeMap].sort(sortAlphaNum))
         .enter()
         .append('option')
         .attr('class', 'sourceOption')
         .attr('value', (d) => d[0])
-        .text((d) => d[1].chromosomeName)
+        .text((d) => d[0])
         .filter((d) => {
             return configuration.markers.target.indexOf(d[0]) > -1;
         })
@@ -100,9 +100,23 @@ export default function(container, configuration, chromosomeMap, callback) {
         .html('<i class="material-icons right">cached</i>GO')
         .on('click', () => {
             callback({
-                'source': _.map(sourceSelectInstance.getSelectedValues(), (o) => Number(o)),
-                'target': _.map(targetSelectInstance.getSelectedValues(), (o) => Number(o))
+                'source': sourceSelectInstance.getSelectedValues(),
+                'target': targetSelectInstance.getSelectedValues(),
             }, d3.select("#darkTheme").property("checked"), d3.select("#plotType").property("checked"));
         });
 
+}
+
+function sortAlphaNum(a, b) {
+    let reA = /[^a-zA-Z]/g;
+    let reN = /[^0-9]/g;
+    let aA = a[0].replace(reA, "");
+    let bA = b[0].replace(reA, "");
+    if (aA === bA) {
+        let aN = parseInt(a[0].replace(reN, ""), 10);
+        let bN = parseInt(b[0].replace(reN, ""), 10);
+        return aN === bN ? 0 : aN > bN ? 1 : -1;
+    } else {
+        return aA > bA ? 1 : -1;
+    }
 }

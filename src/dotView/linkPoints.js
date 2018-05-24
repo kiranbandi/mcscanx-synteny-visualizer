@@ -7,10 +7,10 @@ export default function(svg, configuration, chromosomeMap, alignmentList, genome
 
         let firstLink = alignment.links[0],
             lastLink = alignment.links[alignment.links.length - 1];
-        let sourceChromosome = chromosomeMap.get(alignment.sourceKey),
-            targetChromosome = chromosomeMap.get(alignment.targetKey);
-        let sourceLinePosition = _.find(linePositions.source, (o) => o.key == alignment.sourceKey),
-            targetLinePosition = _.find(linePositions.target, (o) => o.key == alignment.targetKey);
+        let sourceChromosome = chromosomeMap.get(alignment.source),
+            targetChromosome = chromosomeMap.get(alignment.target);
+        let sourceLinePosition = _.find(linePositions.source, (o) => o.key == alignment.source),
+            targetLinePosition = _.find(linePositions.target, (o) => o.key == alignment.target);
 
         let first_link_x = sourceLinePosition.x1 + ((genomeLibrary.get(firstLink.source).start - sourceChromosome.start) / sourceChromosome.width) * (sourceLinePosition.x2 - sourceLinePosition.x1);
         let last_link_x = sourceLinePosition.x1 + ((genomeLibrary.get(lastLink.source).start - sourceChromosome.start) / sourceChromosome.width) * (sourceLinePosition.x2 - sourceLinePosition.x1);
@@ -37,7 +37,7 @@ export default function(svg, configuration, chromosomeMap, alignmentList, genome
         .append('line')
         .merge(alignmentLines)
         .attr('class', (d, i) => {
-            return 'alignment-link-lines alignment-link-source-' + d.alignment.sourceKey + ' alignment-link-target-' + d.alignment.targetKey;
+            return 'alignment-link-lines alignment-link-source-' + d.alignment.source + ' alignment-link-target-' + d.alignment.target;
         })
         .style('stroke', 'blue')
         .style('stroke-width', '3px')

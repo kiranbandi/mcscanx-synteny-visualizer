@@ -49,7 +49,7 @@ function drawPositionalLines(svgContainer, configuration, positions) {
     verticalLineTexts = verticalLineTexts.enter()
         .append('text')
         .merge(verticalLineTexts)
-        .text((d) => d.data.chromosomeName)
+        .text((d) => d.key)
         .attr('class', (d) => 'marker-x-lines-text dot-plot-markers marker-x-lines-text-' + d.key)
         .attr('x', function(d) {
             return (d.x1 + ((d.x2 - d.x1) / 2)) - (this.getBoundingClientRect().width / 2);
@@ -100,7 +100,7 @@ function drawPositionalLines(svgContainer, configuration, positions) {
     horizontalLineTexts = horizontalLineTexts.enter()
         .append('text')
         .merge(horizontalLineTexts)
-        .text((d) => d.data.chromosomeName)
+        .text((d) => d.key)
         .attr('class', (d) => 'marker-y-lines-text dot-plot-markers marker-y-lines-text-' + d.key)
         .attr('y', function(d) {
             return ((d.y1 + ((d.y2 - d.y1) / 2)) + ((this.getBoundingClientRect().height) / 2));
@@ -122,12 +122,12 @@ function initialisePostions(configuration, chromosomeCollection) {
     let posistions = {};
 
     let sourceWidthUsedSoFar = configuration.dotView.offset;
-    posistions.source = _.map(configuration.markers.source, (sourceKey, index) => {
+    posistions.source = _.map(configuration.markers.source, (source, index) => {
         let sourceBit = {
-            'data': chromosomeCollection.get(sourceKey),
-            'key': sourceKey,
+            'data': chromosomeCollection.get(source),
+            'key': source,
             'x1': sourceWidthUsedSoFar,
-            'x2': sourceWidthUsedSoFar + (scaleFactorX * (chromosomeCollection.get(sourceKey).width)),
+            'x2': sourceWidthUsedSoFar + (scaleFactorX * (chromosomeCollection.get(source).width)),
             'y1': configuration.dotView.offset,
             'y2': configuration.dotView.innerWidth + configuration.dotView.offset
         }
@@ -136,12 +136,12 @@ function initialisePostions(configuration, chromosomeCollection) {
     });
 
     let targetWidthUsedSoFar = configuration.dotView.offset;
-    posistions.target = _.map(configuration.markers.target, (targetKey, index) => {
+    posistions.target = _.map(configuration.markers.target, (target, index) => {
         let targetBit = {
-            'data': chromosomeCollection.get(targetKey),
-            'key': targetKey,
+            'data': chromosomeCollection.get(target),
+            'key': target,
             'y1': targetWidthUsedSoFar,
-            'y2': targetWidthUsedSoFar + (scaleFactorY * (chromosomeCollection.get(targetKey).width)),
+            'y2': targetWidthUsedSoFar + (scaleFactorY * (chromosomeCollection.get(target).width)),
             'x1': configuration.dotView.offset,
             'x2': configuration.dotView.innerWidth + configuration.dotView.offset
         }
