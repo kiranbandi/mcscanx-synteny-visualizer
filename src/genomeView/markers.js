@@ -1,6 +1,12 @@
 import _ from 'lodash';
 import * as d3 from 'd3';
 
+let currentClickState = {
+    'clicked': false,
+    'sourceMarkerId': -1,
+    'targetMarkerId': -1
+}
+
 function initialiseMarkers(configuration, chromosomeCollection) {
 
     let maxWidthAvailable = configuration.width;
@@ -47,7 +53,7 @@ function initialiseMarkers(configuration, chromosomeCollection) {
     return markers;
 }
 
-function drawMarkers(svg, configuration) {
+function drawMarkers(svg, configuration, invokeChromosomeView) {
 
     let markerContainer = d3.select('.markerContainer');
 
@@ -71,6 +77,8 @@ function drawMarkers(svg, configuration) {
             .append('line')
             .merge(markerLines)
             .on('mouseover', markerHover.bind({ markerListId }))
+            .on('click', markerClick.bind({ markerListId, invokeChromosomeView }))
+            .on('dblclick', resetClick)
             .on('mouseout', markerOut.bind({ markerListId }))
             .transition()
             .duration(500)
@@ -112,6 +120,8 @@ function drawMarkers(svg, configuration) {
             .attr('class', ' markersText marker-text-' + markerListId)
             .on('mouseover', markerHover.bind({ markerListId }))
             .on('mouseout', markerOut.bind({ markerListId }))
+            .on('click', markerClick.bind({ markerListId, invokeChromosomeView }))
+            .on('dblclick', resetClick)
             .attr('x', function(d) {
                 return d.x + (d.dx / 2) - (this.getBoundingClientRect().width / 2);
             })
@@ -121,23 +131,48 @@ function drawMarkers(svg, configuration) {
 }
 
 function markerHover(d) {
-    if (this.markerListId == 'source') {
-        d3.selectAll(".link")
-            .classed('hiddenLink', true);
-        d3.selectAll('.link-source-' + d.key)
-            .classed('activeLink', true);
+    if (this.markerListId == 'source' && !currentClickState.clicked) {
+        d3.selectAll(".link").classed('hiddenLink', true);
+        d3.selectAll('.link-source-' + d.key).classed('activeLink', true);
     }
 }
 
 function markerOut(d) {
-    if (this.markerListId == 'source') {
+    if (this.markerListId == 'source' && !currentClickState.clicked) {
         d3.selectAll('.hiddenLink').classed('hiddenLink', false);
         d3.selectAll('.activeLink').classed('activeLink', false);
     }
 }
 
-export default function(svg, configuration, chromosomeCollection) {
+function markerClick(d) {
+
+    if (this.markerListId == 'source') {
+        // reset other active links if any 
+        d3.selectAll('.hiddenLink').classed('hiddenLink', false);
+        d3.selectAll('.activeLink').classed('activeLink', false);
+        // set current source links to active
+        d3.selectAll(".link").classed('hiddenLink', true);
+        d3.selectAll('.link-source-' + d.key).classed('activeLink', true);
+        currentClickState.clicked = true;
+        currentClickState.sourceMarkerId = d.key;
+    } else if (this.markerListId == 'target' && currentClickState.sourceMarkerId != -1) {
+        currentClickState.targetMarkerId = d.key;
+        this.invokeChromosomeView(currentClickState.sourceMarkerId, currentClickState.targetMarkerId);
+    }
+}
+
+function resetClick() {
+    currentClickState = {
+        'clicked': false,
+        'sourceMarkerId': -1,
+        'targetMarkerId': -1
+    };
+    d3.selectAll('.hiddenLink').classed('hiddenLink', false);
+    d3.selectAll('.activeLink').classed('activeLink', false);
+}
+
+export default function(svg, configuration, chromosomeCollection, invokeChromosomeView) {
     configuration.markerPositions = initialiseMarkers(configuration, chromosomeCollection);
-    drawMarkers(svg, configuration);
+    drawMarkers(svg, configuration, invokeChromosomeView);
     return configuration;
 }

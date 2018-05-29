@@ -22,7 +22,9 @@ body {
 }
 
 .marker-source,
-.marker-text-source {
+.marker-text-source,
+.marker-target,
+.marker-text-target {
     cursor: pointer;
 }
 
@@ -34,18 +36,16 @@ body {
 
 .link.hiddenLink {
     stroke-opacity: .01;
+    pointer-events: none;
 }
 
 .link.activeLink.link.hiddenLink {
     stroke-opacity: .9;
+    pointer-events: all;
 }
 
-.link:hover {
+.hover-link:hover {
     stroke-opacity: .9;
-}
-
-.darkPlot .link:hover {
-    stroke-opacity: 0.9;
 }
 
 .markersText {
@@ -62,7 +62,8 @@ body {
     width: 95%;
 }
 
-.filterheader {
+.filterheader,
+.genomeViewHeader {
     margin-bottom: 1em;
     margin-top: 1em;
 }
@@ -71,8 +72,8 @@ body {
     font-size: 1.5em;
 }
 
-.dotViewVis,
-.linearViewVis {
+.genomeViewSVG,
+.dotViewSVG {
     margin: 20px auto 40px auto;
     display: block;
     border-radius: 1em;

@@ -2,7 +2,8 @@ import * as d3 from 'd3';
 import axios from 'axios';
 import processGFF from './processGFF';
 import processCollinear from './processCollinear';
-import linearView from './linearView/linearView';
+import processQueryParams from './processQueryParams';
+import genomeView from './genomeView/genomeView';
 import dotView from './dotView/dotView';
 import displayInformation from './displayInformation';
 import filterPanel from './filterPanel';
@@ -17,20 +18,8 @@ import { sampleSourceMapper } from './sampleSourceMapper';
 // Refine the plots 
 // Add interactivity to the plots 
 
-const getParams = query => {
-    if (!query) {
-        return {};
-    }
-    return (/^[?#]/.test(query) ? query.slice(1) : query)
-        .split('&')
-        .reduce((params, param) => {
-            let [key, value] = param.split('=');
-            params[key] = value ? decodeURIComponent(value.replace(/\+/g, ' ')) : '';
-            return params;
-        }, {});
-};
-
-let sourceName = getParams(window.location.search).source || 'bn';
+// get the source name based on window query params or set to default 'bn'(brassica napus - canola)
+let sourceName = processQueryParams().source || 'bn';
 
 // Loading the gff file 
 axios.get('assets/files/' + sourceName + '_coordinate.gff').then(function(coordinateFile) {
@@ -54,33 +43,28 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         .attr('class', 'headContainer row'),
 
         width = rootContainer.node().clientWidth,
-        dotViewWidth = Math.min(width, 750),
 
-        linearViewVis = rootContainer.append('svg')
-        .attr('class', 'linearViewVis')
-        // temporarily hardcoded to 500 pixels
-        .attr('height', 400)
-        .attr('width', width);
+        genomeViewContainer = rootContainer.append('div')
+        .attr('class', 'genomeViewContainer'),
 
-    let dotViewVis = rootContainer.append('svg')
-        .attr('class', 'dotViewVis hide')
-        // temporarily hardcoded to 500 pixels
-        .attr('height', dotViewWidth)
-        .attr('width', dotViewWidth);
+        dotViewContainer = rootContainer.append('div')
+        .attr('class', 'dotViewContainer hide');
+
 
     // markerPositions and links are populated  
     // need to reconfigure seperately for each plot indivually at some point in the not so far future
     let configuration = {
         'width': width,
+        'isDarkTheme': false, // default theme is light 
         'verticalPositions': {
             'source': 50,
             'target': 375
         },
-        'markers': sampleSourceMapper[sourceName],
+        'markers': sampleSourceMapper[sourceName], // default markers are preset based on the sample
         'markerPositions': {},
         'links': [],
         'dotView': {
-            'width': dotViewWidth
+            'width': width
         }
     };
 
@@ -90,24 +74,22 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         .attr('class', 'subContainer filterContainer col s12 center-align');
 
     filterPanel(filterContainer, configuration, chromosomeMap, function(selectedMarkers, isDarkTheme, isDotPlot) {
-
-        //  hadle theming 
-        linearViewVis.classed('darkPlot', isDarkTheme);
-        dotViewVis.classed('darkPlot', isDarkTheme);
         // show hide plots based on options
-        linearViewVis.classed('hide', isDotPlot);
-        dotViewVis.classed('hide', !isDotPlot);
+        genomeViewContainer.classed('hide', isDotPlot);
+        dotViewContainer.classed('hide', !isDotPlot);
         // filter markers
         configuration.markers = selectedMarkers;
+        configuration.isDarkTheme = isDarkTheme;
+        // process alignments for given markers
         let updatedAlignmentList = processAlignment(configuration.markers, alignmentList);
-        // call plot functions depending on the options
+        // call the respective plot generating functions
         if (isDotPlot) {
-            dotView(dotViewVis, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
+            dotView(dotViewContainer, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
         } else {
-            linearView(linearViewVis, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
+            genomeView(genomeViewContainer, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
         }
     });
 
     let processedAlignmentList = processAlignment(configuration.markers, alignmentList);
-    linearView(linearViewVis, configuration, processedAlignmentList, genomeLibrary, chromosomeMap);
+    genomeView(genomeViewContainer, configuration, processedAlignmentList, genomeLibrary, chromosomeMap);
 }
