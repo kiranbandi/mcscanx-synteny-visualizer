@@ -12,7 +12,6 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
 
     // if svg doesnt exist create it 
     if (!genomeViewSVG.node()) {
-
         genomeViewHeader = container.append('h4')
             .attr('class', 'genomeViewHeader red-text text-lighten-2 center-align');
 
@@ -22,7 +21,6 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
             // temporarily hardcoded to 425 pixels
             .attr('height', 425)
             .attr('width', configuration.width);
-
     }
 
     //set theming based on configuration params
