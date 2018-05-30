@@ -1,10 +1,18 @@
 import _ from 'lodash';
 import * as d3 from 'd3';
 
-let currentClickState = {
-    'clicked': false,
-    'sourceMarkerId': -1,
-    'targetMarkerId': -1
+// variable scope blocked locally
+let currentClickState;
+
+export default function(svg, configuration, chromosomeCollection, isGenomeView, chromosomeViewCallback) {
+    currentClickState = {
+        'clicked': false,
+        'sourceMarkerId': -1,
+        'targetMarkerId': -1
+    }
+    configuration.markerPositions = initialiseMarkers(configuration, chromosomeCollection);
+    drawMarkers(svg, configuration, isGenomeView, chromosomeViewCallback);
+    return configuration;
 }
 
 function initialiseMarkers(configuration, chromosomeCollection) {
@@ -53,7 +61,7 @@ function initialiseMarkers(configuration, chromosomeCollection) {
     return markers;
 }
 
-function drawMarkers(svg, configuration, invokeChromosomeView) {
+function drawMarkers(svg, configuration, isGenomeView, chromosomeViewCallback) {
 
     let markerContainer = d3.select('.markerContainer');
 
@@ -76,11 +84,23 @@ function drawMarkers(svg, configuration, invokeChromosomeView) {
             .enter()
             .append('line')
             .merge(markerLines)
-            .on('mouseover', markerHover.bind({ markerListId }))
-            .on('click', markerClick.bind({ markerListId, invokeChromosomeView }))
-            .on('dblclick', resetClick)
-            .on('mouseout', markerOut.bind({ markerListId }))
-            .transition()
+
+        if (isGenomeView) {
+            markerLines
+                .on('mouseover', markerHover.bind({ markerListId }))
+                .on('mouseout', markerOut.bind({ markerListId }))
+                .on('click', markerClick.bind({ markerListId, chromosomeViewCallback }))
+                .on('dblclick', resetClick);
+        } else {
+            // switch of events
+            markerLines
+                .on('mouseover', null)
+                .on('mouseout', null)
+                .on('click', null)
+                .on('dblclick', null);
+        }
+
+        markerLines.transition()
             .duration(500)
             .attr('class', (d, i) => {
                 return 'chromosomeMarkers marker-' + markerListId + " marker-" + markerListId + "-" + d.key;
@@ -104,8 +124,7 @@ function drawMarkers(svg, configuration, invokeChromosomeView) {
             .attr('x2', (d) => {
                 return (d.x + d.dx);
             })
-            .attr('y2', configuration.verticalPositions[markerListId])
-
+            .attr('y2', configuration.verticalPositions[markerListId]);
 
         let markerTextUnits = markerContainer
             .selectAll('.marker-text-' + markerListId)
@@ -118,14 +137,25 @@ function drawMarkers(svg, configuration, invokeChromosomeView) {
             .merge(markerTextUnits)
             .text((d) => d.key)
             .attr('class', ' markersText marker-text-' + markerListId)
-            .on('mouseover', markerHover.bind({ markerListId }))
-            .on('mouseout', markerOut.bind({ markerListId }))
-            .on('click', markerClick.bind({ markerListId, invokeChromosomeView }))
-            .on('dblclick', resetClick)
             .attr('x', function(d) {
                 return d.x + (d.dx / 2) - (this.getBoundingClientRect().width / 2);
             })
             .attr('y', configuration.verticalPositions[markerListId] + 5);
+
+        if (isGenomeView) {
+            markerTextUnits
+                .on('mouseover', markerHover.bind({ markerListId }))
+                .on('mouseout', markerOut.bind({ markerListId }))
+                .on('click', markerClick.bind({ markerListId, chromosomeViewCallback }))
+                .on('dblclick', resetClick);
+        } else {
+            // switch of events
+            markerTextUnits
+                .on('mouseover', null)
+                .on('mouseout', null)
+                .on('click', null)
+                .on('dblclick', null);
+        }
     })
 
 }
@@ -145,7 +175,6 @@ function markerOut(d) {
 }
 
 function markerClick(d) {
-
     if (this.markerListId == 'source') {
         // reset other active links if any 
         d3.selectAll('.hiddenLink').classed('hiddenLink', false);
@@ -157,7 +186,7 @@ function markerClick(d) {
         currentClickState.sourceMarkerId = d.key;
     } else if (this.markerListId == 'target' && currentClickState.sourceMarkerId != -1) {
         currentClickState.targetMarkerId = d.key;
-        this.invokeChromosomeView(currentClickState.sourceMarkerId, currentClickState.targetMarkerId);
+        this.chromosomeViewCallback(currentClickState.sourceMarkerId, currentClickState.targetMarkerId);
     }
 }
 
@@ -169,10 +198,4 @@ function resetClick() {
     };
     d3.selectAll('.hiddenLink').classed('hiddenLink', false);
     d3.selectAll('.activeLink').classed('activeLink', false);
-}
-
-export default function(svg, configuration, chromosomeCollection, invokeChromosomeView) {
-    configuration.markerPositions = initialiseMarkers(configuration, chromosomeCollection);
-    drawMarkers(svg, configuration, invokeChromosomeView);
-    return configuration;
 }

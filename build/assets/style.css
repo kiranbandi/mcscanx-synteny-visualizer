@@ -62,8 +62,7 @@ body {
     width: 95%;
 }
 
-.filterheader,
-.genomeViewHeader {
+.filterheader {
     margin-bottom: 1em;
     margin-top: 1em;
 }
