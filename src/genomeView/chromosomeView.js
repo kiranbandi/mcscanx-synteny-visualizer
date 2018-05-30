@@ -1,6 +1,7 @@
 import * as d3 from 'd3';
 import markerSetup from './markers';
 import linkSetup from './links';
+import linkLegends from './linkLegends';
 
 export default function(container, configuration, alignmentList, genomeLibrary, chromosomeMap) {
 
@@ -13,6 +14,10 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
     container.select('.genomeViewSVG').classed('hide', true);
     // clear its contents to ensure no cross issues
     container.select('.genomeViewSVG').selectAll('*').remove();
+
+    // Add Legend to Chromosome View
+    let chromosomeLegend = container.append('div').attr('class', 'chromosomeLegend');
+    linkLegends(chromosomeLegend);
 
     let chromosomeViewRootSVG = container
         .append('svg')

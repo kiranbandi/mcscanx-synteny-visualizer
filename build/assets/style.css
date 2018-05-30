@@ -79,6 +79,11 @@ body {
     border-radius: 1em;
 }
 
+.chromosomeViewRootSVG,
+.dotViewSVG {
+    border: 2px solid silver;
+}
+
 .dot-plot-markers {
     fill: grey;
     font-weight: bold;
@@ -94,10 +99,7 @@ body {
     color: #38e346
 }
 
-.chromosomeViewRootSVG {
-    border: 2px solid silver;
-}
-
-.dotViewSVG {
-    border: 2px solid silver;
+.globalLegendBox {
+    display: inline-block;
+    min-width: 270px;
 }

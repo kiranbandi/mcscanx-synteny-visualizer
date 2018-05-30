@@ -37,8 +37,10 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
         genomeViewSVG.classed('hide', false);
         genomeViewHeader.text("Genome View");
 
-        // clear existing chromosomeView if any
+        // clear existing chromosomeView assets if any
         container.select('.chromosomeViewRootSVG').remove();
+        container.select('.chromosomeLegend').remove();
+
 
         configuration = markerSetup(genomeViewSVG, configuration, chromosomeMap, true, function(sourceMarkerID, targetMarkerID) {
             configuration.markers = { 'source': [sourceMarkerID], 'target': [targetMarkerID] };
