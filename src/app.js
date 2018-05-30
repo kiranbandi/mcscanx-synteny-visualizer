@@ -10,7 +10,7 @@ import filterPanel from './filterPanel';
 import processAlignment from './filterAlignments';
 import { sampleSourceMapper } from './sampleSourceMapper';
 
-/* GOLDEN RULES written by ancient druid - do not alter ¯\_(ツ)_/¯  */
+/* GOLDEN RULES written by  "He who must not be named" - do not alter ¯\_(ツ)_/¯  */
 // Load the Data gff file and syteny collinearity file 
 // Parse the Data and store it in appropriate data structures 
 // Filter it for useful information and mine it to decide on what to represent 
@@ -60,7 +60,7 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
             'source': 50,
             'target': 375
         },
-        'markers': sampleSourceMapper[sourceName], // default markers are preset based on the sample
+        'markers': sampleSourceMapper[sourceName], // default preset markers are loaded from the sampleSourceMapper
         'markerPositions': {},
         'links': [],
         'dotView': {

@@ -96,7 +96,7 @@ function drawLinks(svg, links, configuration) {
                 "\n E value : " + d.alignment.e_value +
                 "\n score : " + d.alignment.score +
                 "\n count : " + d.alignment.count
-        });
+        })
 }
 
 function createLinkPath(d) {
