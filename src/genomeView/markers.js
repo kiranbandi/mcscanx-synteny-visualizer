@@ -63,7 +63,7 @@ function initialiseMarkers(configuration, chromosomeCollection) {
 
 function drawMarkers(svg, configuration, isGenomeView, chromosomeViewCallback) {
 
-    let markerContainer = d3.select('.markerContainer');
+    let markerContainer = svg.select('.markerContainer');
 
     // if container doesnt exist create it 
     if (!markerContainer.node()) {

@@ -72,7 +72,8 @@ body {
 }
 
 .genomeViewSVG,
-.dotViewSVG {
+.dotViewSVG,
+.chromosomeViewRootSVG {
     margin: 20px auto 40px auto;
     display: block;
     border-radius: 1em;
@@ -91,4 +92,8 @@ body {
 
 .footer-link {
     color: #38e346
+}
+
+.chromosomeViewRootSVG {
+    border: 2px solid silver;
 }
