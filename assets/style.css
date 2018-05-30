@@ -98,3 +98,16 @@ body {
 .footer-link {
     color: #38e346
 }
+
+.globalLegendBox {
+    display: inline-block;
+    min-width: 270px;
+}
+
+.brand-logo {
+    margin-left: 10px;
+}
+
+#synVisio nav li>a {
+    font-weight: bold;
+}
