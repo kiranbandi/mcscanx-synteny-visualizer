@@ -8,6 +8,7 @@ import dotView from './dotView/dotView';
 import displayInformation from './displayInformation';
 import filterPanel from './filterPanel';
 import processAlignment from './filterAlignments';
+import navbar from './navbar';
 import { sampleSourceMapper } from './sampleSourceMapper';
 
 /* GOLDEN RULES written by  "He who must not be named" - do not alter ¯\_(ツ)_/¯  */
@@ -20,6 +21,9 @@ import { sampleSourceMapper } from './sampleSourceMapper';
 
 // get the source name based on window query params or set to default 'bn'(brassica napus - canola)
 let sourceName = processQueryParams().source || 'bn';
+
+//initialise navbar functionality
+navbar();
 
 // Loading the gff file 
 axios.get('assets/files/' + sourceName + '_coordinate.gff').then(function(coordinateFile) {

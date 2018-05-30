@@ -17,10 +17,33 @@
     <title>UofS MCScanX Synteny Browser</title>
 </head>
 
-<body>
+<body id='synVisio'>
+    <nav>
+        <div class="nav-wrapper">
+            <a href="/" class="brand-logo">SynVisio</a>
+            <a href="#" data-target="mobile-nav" class="sidenav-trigger"><i class="material-icons">menu</i></a>
+            <ul id="nav-mobile" class="right hide-on-med-and-down">
+                <li><a class='nav-link doc-link' href="#"><i class="material-icons left">description</i> Documentation</a></li>
+                <li><a class='nav-link tool-link' href="#"><i class="material-icons left">poll</i>Tool</a></li>
+            </ul>
+        </div>
+    </nav>
+
+    <ul class="sidenav" id="mobile-nav">
+        <li><a class='nav-link doc-link' href="#"><i class="material-icons left">description</i> Documentation</a></li>
+        <li><a class='nav-link tool-link' href="#"><i class="material-icons left">poll</i>Tool</a></li>
+    </ul>
+
     <main class='container'>
-        <h3 class="blue-text text-accent-2 center-align">SynVisio : MCScanX Synteny Visualizer Tool</h3>
-        <div id='root'></div>
+        <div id='doc-root' class='root-container hide'>
+            <h3 class="blue-text text-accent-2 center-align">SynVisio : MCScanX Synteny Visualizer Tool</h3>
+        </div>
+
+        <div id='tool-root' class='root-container'>
+            <div id='root'>
+            </div>
+        </div>
+
     </main>
     <!--JavaScript at end of body for optimized loading-->
     <script type="text/javascript" src="assets/materialize/js/materialize.min.js"></script>
