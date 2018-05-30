@@ -97,3 +97,7 @@ body {
 .chromosomeViewRootSVG {
     border: 2px solid silver;
 }
+
+.dotViewSVG {
+    border: 2px solid silver;
+}

@@ -46,4 +46,14 @@ export default function(svg, configuration, chromosomeMap, alignmentList, genome
         .attr('y1', (d) => d.y1)
         .attr('y2', (d) => d.y2)
 
+    // title is an SVG standard way of providing tooltips, up to the browser how to render this, so changing the style is tricky
+    alignmentLines.append('title')
+        .text((d) => {
+            return d.alignment.source + " => " + d.alignment.target +
+                "\n type : " + d.alignment.type +
+                "\n E value : " + d.alignment.e_value +
+                "\n score : " + d.alignment.score +
+                "\n count : " + d.alignment.count
+        });
+
 }

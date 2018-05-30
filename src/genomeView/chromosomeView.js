@@ -34,15 +34,11 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
     // create an instance of d3 zoom
     let zoomInstance = d3.zoom()
         .scaleExtent([1, 4])
-        .filter(() => {
-            if (d3.event.type == 'dblclick') {
-                return false;
-            }
-            return true;
-        })
+        .filter(() => !(d3.event.type == 'dblclick'))
         .on("zoom", () => {
             chromosomeViewSVG.attr("transform", d3.event.transform);
-        })
+        });
+
     chromosomeViewRootSVG.call(zoomInstance);
 
     let markerConfiguration = markerSetup(chromosomeViewSVG, configuration, chromosomeMap, false);
