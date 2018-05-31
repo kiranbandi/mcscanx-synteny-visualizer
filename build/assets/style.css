@@ -111,3 +111,25 @@ body {
 #synVisio nav li>a {
     font-weight: bold;
 }
+
+#doc-root p,
+#doc-root ul {
+    font-size: 1.2em;
+}
+
+#doc-root ul {
+    margin-left: 15px;
+}
+
+#doc-root li {
+    list-style-type: disc;
+}
+
+.preloader-wrapper.active {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    margin: auto;
+}

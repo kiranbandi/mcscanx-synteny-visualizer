@@ -31,6 +31,9 @@ axios.get('assets/files/' + sourceName + '_coordinate.gff').then(function(coordi
 
     // Loading the collinearity file 
     axios.get('assets/files/' + sourceName + '_collinear.collinearity').then(function(collinearFile) {
+
+        d3.select('#loader-container').classed('hide', true);
+
         let { information, alignmentList } = processCollinear(collinearFile.data);
         console.log('Data loading and processing complete...');
         start(information, alignmentList, genomeLibrary, chromosomeMap);
