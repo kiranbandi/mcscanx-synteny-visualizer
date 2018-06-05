@@ -1,9 +1,11 @@
 import _ from 'lodash';
 import * as d3 from 'd3';
 
-export default function(svg, configuration, alignmentList, chromosomeMap, genomeLibrary) {
+export default function(svg, configuration, alignmentList, chromosomeMap, genomeLibrary, zoomInstance) {
+
     let links = initialiseLinks(configuration, alignmentList, genomeLibrary, chromosomeMap);
-    drawLinks(svg, links, configuration);
+    drawLinks(svg, links, configuration, zoomInstance);
+
 }
 
 function initialiseLinks(configuration, alignmentList, genomeLibrary, chromosomeMap) {
@@ -50,7 +52,7 @@ function initialiseLinks(configuration, alignmentList, genomeLibrary, chromosome
 }
 
 
-function drawLinks(svg, links, configuration) {
+function drawLinks(svg, links, configuration, zoomInstance) {
 
     let linkContainer = svg.select('.linkContainer');
 
@@ -83,12 +85,15 @@ function drawLinks(svg, links, configuration) {
             return d.width;
         })
         .style('stroke', (d, i) => {
-            let sourceIndex = configuration.markers.source.indexOf(d.alignment.source);
-            return ((sourceIndex == -1) || sourceIndex > 9) ? '#808080' : d3.schemeCategory10[sourceIndex];
+            return d.alignment.type == 'regular' ? d3.schemeCategory10[0] : d3.schemeCategory10[3];
         })
-
-    // title is an SVG standard way of providing tooltips, up to the browser how to render this, so changing the style is tricky
-    genomicLinks.append('title')
+        .on('dblclick', function(d) {
+            d3.selectAll(".chromosomeViewRootSVG .link").classed('hiddenLink', true);
+            d3.select(this).classed('activeLink', true);
+            svg.call(zoomInstance.transform, d3.zoomIdentity.scale(1).translate(0, 0));
+        })
+        // title is an SVG standard way of providing tooltips, up to the browser how to render this, so changing the style is tricky
+        .append('title')
         .text((d) => {
             return d.alignment.source + " => " + d.alignment.target +
                 "\n type : " + d.alignment.type +
@@ -96,7 +101,6 @@ function drawLinks(svg, links, configuration) {
                 "\n score : " + d.alignment.score +
                 "\n count : " + d.alignment.count
         });
-
 }
 
 function createLinkPath(d) {

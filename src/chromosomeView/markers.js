@@ -84,10 +84,6 @@ function drawMarkers(svg, configuration, chromosomeViewCallback) {
             .enter()
             .append('line')
             .merge(markerLines)
-            .on('mouseover', markerHover.bind({ markerListId }))
-            .on('mouseout', markerOut.bind({ markerListId }))
-            .on('click', markerClick.bind({ markerListId, chromosomeViewCallback }))
-            .on('dblclick', resetClick)
             .transition()
             .duration(500)
             .attr('class', (d, i) => {
@@ -128,38 +124,33 @@ function drawMarkers(svg, configuration, chromosomeViewCallback) {
             .attr('x', function(d) {
                 return d.x + (d.dx / 2) - (this.getBoundingClientRect().width / 2);
             })
-            .attr('y', configuration.verticalPositions[markerListId] + 5)
-            .on('mouseover', markerHover.bind({ markerListId }))
-            .on('mouseout', markerOut.bind({ markerListId }))
-            .on('click', markerClick.bind({ markerListId, chromosomeViewCallback }))
-            .on('dblclick', resetClick);
-
+            .attr('y', configuration.verticalPositions[markerListId] + 5);
     })
 
 }
 
 function markerHover(d) {
     if (this.markerListId == 'source' && !currentClickState.clicked) {
-        d3.selectAll(".genomeViewSVG .link").classed('hiddenLink', true);
-        d3.selectAll('.genomeViewSVG .link-source-' + d.key).classed('activeLink', true);
+        d3.selectAll(".chromosomeViewRootSVG .link").classed('hiddenLink', true);
+        d3.selectAll('.chromosomeViewRootSVG .link-source-' + d.key).classed('activeLink', true);
     }
 }
 
 function markerOut(d) {
     if (this.markerListId == 'source' && !currentClickState.clicked) {
-        d3.selectAll('.genomeViewSVG .hiddenLink').classed('hiddenLink', false);
-        d3.selectAll('.genomeViewSVG .activeLink').classed('activeLink', false);
+        d3.selectAll('.chromosomeViewRootSVG .hiddenLink').classed('hiddenLink', false);
+        d3.selectAll('.chromosomeViewRootSVG .activeLink').classed('activeLink', false);
     }
 }
 
 function markerClick(d) {
     if (this.markerListId == 'source') {
         // reset other active links if any 
-        d3.selectAll('.genomeViewSVG .hiddenLink').classed('hiddenLink', false);
-        d3.selectAll('.genomeViewSVG .activeLink').classed('activeLink', false);
+        d3.selectAll('.chromosomeViewRootSVG .hiddenLink').classed('hiddenLink', false);
+        d3.selectAll('.chromosomeViewRootSVG .activeLink').classed('activeLink', false);
         // set current source links to active
-        d3.selectAll(".genomeViewSVG .link").classed('hiddenLink', true);
-        d3.selectAll('.genomeViewSVG .link-source-' + d.key).classed('activeLink', true);
+        d3.selectAll(".chromosomeViewRootSVG .link").classed('hiddenLink', true);
+        d3.selectAll('.chromosomeViewRootSVG .link-source-' + d.key).classed('activeLink', true);
         currentClickState.clicked = true;
         currentClickState.sourceMarkerId = d.key;
     } else if (this.markerListId == 'target' && currentClickState.sourceMarkerId != -1) {
@@ -174,6 +165,6 @@ function resetClick() {
         'sourceMarkerId': -1,
         'targetMarkerId': -1
     };
-    d3.selectAll('.genomeViewSVG .hiddenLink').classed('hiddenLink', false);
-    d3.selectAll('.genomeViewSVG .activeLink').classed('activeLink', false);
+    d3.selectAll('.chromosomeViewRootSVG .hiddenLink').classed('hiddenLink', false);
+    d3.selectAll('.chromosomeViewRootSVG .activeLink').classed('activeLink', false);
 }

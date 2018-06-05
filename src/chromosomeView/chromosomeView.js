@@ -8,18 +8,25 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
     // unlike earlier cases the container here is cleared and added as fresh svg everytime
     // this ensure that zooming and panning works smoothly without colidding with earlier assets
 
+    if (container.select('.chromosomeViewContainer').node()) {
+        container.select('.chromosomeViewContainer').remove();
+    }
+
+    let chromosomeViewContainer = container.append('div')
+        .attr('class', 'chromosomeViewContainer');
+
+    chromosomeViewContainer.append('h4')
+        .attr('class', 'genomeViewHeader red-text text-lighten-2 center-align')
+        .text('Chromosome View');
+
     // change header text to chromosome view
-    container.select('.genomeViewHeader').text('Chromosome View');
-    // hide genomeViewSVG
-    container.select('.genomeViewSVG').classed('hide', true);
-    // clear its contents to ensure no cross issues
-    container.select('.genomeViewSVG').selectAll('*').remove();
+    chromosomeViewContainer.select('.genomeViewHeader').text('Chromosome View');
 
     // Add Legend to Chromosome View
-    let chromosomeLegend = container.append('div').attr('class', 'chromosomeLegend');
+    let chromosomeLegend = chromosomeViewContainer.append('div').attr('class', 'chromosomeLegend');
     linkLegends(chromosomeLegend);
 
-    let chromosomeViewRootSVG = container
+    let chromosomeViewRootSVG = chromosomeViewContainer
         .append('svg')
         .attr('class', 'chromosomeViewRootSVG')
         // temporarily hardcoded to 425 pixels
@@ -31,10 +38,9 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
         .attr('class', 'chromosomeViewSVG')
         // temporarily hardcoded to 425 pixels
         .attr('height', 425)
-        .attr('width', configuration.width);
-
-    //set theming based on configuration params
-    chromosomeViewRootSVG.classed('darkPlot', configuration.isDarkTheme);
+        .attr('width', configuration.width)
+        //set theming based on configuration params
+        .classed('darkPlot', configuration.isDarkTheme);
 
     // create an instance of d3 zoom
     let zoomInstance = d3.zoom()
@@ -46,8 +52,8 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
 
     chromosomeViewRootSVG.call(zoomInstance);
 
-    let markerConfiguration = markerSetup(chromosomeViewSVG, configuration, chromosomeMap, false);
-    linkSetup(chromosomeViewSVG, markerConfiguration, alignmentList, chromosomeMap, genomeLibrary, false, zoomInstance);
+    let markerConfiguration = markerSetup(chromosomeViewSVG, configuration, chromosomeMap);
+    linkSetup(chromosomeViewSVG, markerConfiguration, alignmentList, chromosomeMap, genomeLibrary, zoomInstance);
 
     // reset button 
     chromosomeViewRootSVG
@@ -75,8 +81,8 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
 
     function resetEffects() {
         chromosomeViewRootSVG.call(zoomInstance.transform, d3.zoomIdentity.scale(1).translate(0, 0));
-        d3.selectAll('.hiddenLink').classed('hiddenLink', false);
-        d3.selectAll('.activeLink').classed('activeLink', false);
+        d3.selectAll('.chromosomeViewRootSVG .hiddenLink').classed('hiddenLink', false);
+        d3.selectAll('.chromosomeViewRootSVG .activeLink').classed('activeLink', false);
     }
 
 }

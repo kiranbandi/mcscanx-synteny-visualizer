@@ -1,5 +1,4 @@
 // the files need to be located in the files sub folder inside assets folder 
-// root is the name of the file and link the name of the folder container the link files 
 export const sampleSourceMapper = {
     'at': {
         'source': ['at1', 'at2', 'at3', 'at4', 'at5'],

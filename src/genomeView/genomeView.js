@@ -3,7 +3,7 @@ import _ from 'lodash';
 import markerSetup from './markers';
 import linkSetup from './links';
 import processAlignment from '../filterAlignments';
-import chromosomeView from './chromosomeView';
+import chromosomeView from '../chromosomeView/chromosomeView';
 
 export default function(container, configuration, alignmentList, genomeLibrary, chromosomeMap) {
 
@@ -26,6 +26,9 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
     //set theming based on configuration params
     genomeViewSVG.classed('darkPlot', configuration.isDarkTheme);
 
+    // clear existing chromosomeView assets if any
+    container.select('.chromosomeViewContainer').remove();
+
     if (configuration.markers.source.length == 0 || configuration.markers.target.length == 0) {
         genomeViewSVG.classed('hide', true);
         container.select('.chromosomeViewSVG').classed('hide', true);
@@ -37,17 +40,13 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
         genomeViewSVG.classed('hide', false);
         genomeViewHeader.text("Genome View");
 
-        // clear existing chromosomeView assets if any
-        container.select('.chromosomeViewRootSVG').remove();
-        container.select('.chromosomeLegend').remove();
-
-
-        configuration = markerSetup(genomeViewSVG, configuration, chromosomeMap, true, function(sourceMarkerID, targetMarkerID) {
+        configuration = markerSetup(genomeViewSVG, configuration, chromosomeMap, function(sourceMarkerID, targetMarkerID) {
             configuration.markers = { 'source': [sourceMarkerID], 'target': [targetMarkerID] };
             // process alignments for selected markers
             let updatedAlignmentList = processAlignment(configuration.markers, alignmentList);
             chromosomeView(container, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
         });
+
         linkSetup(genomeViewSVG, configuration, alignmentList, chromosomeMap, genomeLibrary);
     }
 

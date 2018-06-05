@@ -39,7 +39,6 @@ export default function(svg, configuration, chromosomeMap, alignmentList, genome
         .attr('class', (d, i) => {
             return 'alignment-link-lines alignment-link-source-' + d.alignment.source + ' alignment-link-target-' + d.alignment.target;
         })
-        .style('stroke', 'blue')
         .style('stroke-width', '3px')
         .attr('x1', (d) => d.x1)
         .attr('x2', (d) => d.x2)

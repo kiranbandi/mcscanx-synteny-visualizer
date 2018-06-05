@@ -8,10 +8,10 @@ import dotView from './dotView/dotView';
 import displayInformation from './displayInformation';
 import filterPanel from './filterPanel';
 import processAlignment from './filterAlignments';
-import navbar from './navbar';
+import setupRoot from './setupRoot';
 import { sampleSourceMapper } from './sampleSourceMapper';
 
-/* GOLDEN RULES written by  "He who must not be named" - do not alter ¯\_(ツ)_/¯  */
+/* BASIC FUNCTIONALITY RULES written by  "He who must not be named" - do not alter ¯\_(ツ)_/¯  */
 // Load the Data gff file and syteny collinearity file 
 // Parse the Data and store it in appropriate data structures 
 // Filter it for useful information and mine it to decide on what to represent 
@@ -19,22 +19,20 @@ import { sampleSourceMapper } from './sampleSourceMapper';
 // Refine the plots 
 // Add interactivity to the plots 
 
+//initialise root and navbar
+setupRoot();
+
 // get the source name based on window query params or set to default 'bn'(brassica napus - canola)
 let sourceName = processQueryParams().source || 'bn';
 
-//initialise navbar functionality
-navbar();
-
-// Loading the gff file 
+// Loading the gff file  - Will Eventually be moved into the file loader container
 axios.get('assets/files/' + sourceName + '_coordinate.gff').then(function(coordinateFile) {
     let { genomeLibrary, chromosomeMap } = processGFF(coordinateFile.data);
-
     // Loading the collinearity file 
     axios.get('assets/files/' + sourceName + '_collinear.collinearity').then(function(collinearFile) {
-
-        d3.select('#loader-container').classed('hide', true);
-
         let { information, alignmentList } = processCollinear(collinearFile.data);
+        //hide loader one file loading and processing is complete
+        d3.select('#loader-container').classed('hide', true);
         console.log('Data loading and processing complete...');
         start(information, alignmentList, genomeLibrary, chromosomeMap);
     });
@@ -42,45 +40,36 @@ axios.get('assets/files/' + sourceName + '_coordinate.gff').then(function(coordi
 
 function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) {
 
-    let rootContainer = d3.select("#root")
+    let rootContainer = d3.select("#tool-root")
         .append('div')
         .attr('class', 'rootContainer'),
-
         headContainer = rootContainer.append('div')
         .attr('class', 'headContainer row'),
-
-        width = rootContainer.node().clientWidth,
-
         genomeViewContainer = rootContainer.append('div')
         .attr('class', 'genomeViewContainer'),
-
         dotViewContainer = rootContainer.append('div')
         .attr('class', 'dotViewContainer hide');
-
 
     // markerPositions and links are populated  
     // need to reconfigure seperately for each plot indivually at some point in the not so far future
     let configuration = {
-        'width': width,
+        'width': rootContainer.node().clientWidth,
         'isDarkTheme': false, // default theme is light 
         'verticalPositions': {
             'source': 50,
             'target': 375
         },
         'markers': sampleSourceMapper[sourceName], // default preset markers are loaded from the sampleSourceMapper
-        'markerPositions': {},
-        'links': [],
         'dotView': {
-            'width': width
+            'width': rootContainer.node().clientWidth
         }
     };
 
+    // Display basic information regarding the synteny present in the output file of McScanX
     displayInformation(headContainer, syntenyInformation);
 
-    let filterContainer = headContainer.append('div')
-        .attr('class', 'subContainer filterContainer col s12 center-align');
-
-    filterPanel(filterContainer, configuration, chromosomeMap, function(selectedMarkers, isDarkTheme, isDotPlot) {
+    // Initialise Filter Panel
+    filterPanel(headContainer, configuration, chromosomeMap, function(selectedMarkers, isDarkTheme, isDotPlot) {
         // show hide plots based on options
         genomeViewContainer.classed('hide', isDotPlot);
         dotViewContainer.classed('hide', !isDotPlot);
@@ -96,7 +85,4 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
             genomeView(genomeViewContainer, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
         }
     });
-
-    let processedAlignmentList = processAlignment(configuration.markers, alignmentList);
-    genomeView(genomeViewContainer, configuration, processedAlignmentList, genomeLibrary, chromosomeMap);
 }

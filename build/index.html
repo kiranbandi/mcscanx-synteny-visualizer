@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 
 <head>
@@ -36,73 +35,8 @@
 
     <main class='container'>
         <h3 class="blue-text text-accent-2 center-align">SynVisio : MCScanX Synteny Visualizer Tool</h3>
-        <div id='doc-root' class='root-container hide'>
-            <div class='section'>
-                <p>SynVisio is an interactive multiscale visualization tool that lets you explore the results of <a href='http://chibba.pgml.uga.edu/mcscan2/'>McScanX</a> a popular synteny and collinearity detection toolkit. SynVisio requires two files to
-                    run:
-                </p>
-                <ul>
-                    <li>The <b>simplified gff file</b> that was used as an input for a McScanX query.</li>
-                    <li>The <b>collinearity file</b> generated as an output by McScanX for the same input query.</li>
-                </ul>
-                <p>
-                    SynVisio offers two basic forms of visualizations a <b>Linear bar plot</b> and a <b>Dot plot</b>. General information regarding the paramters that were set for McScanX and the percetage share of collinear genes, are read from the collinearity
-                    file and displayed above with the plots. Users can choose the source and the target chromosomes and the type of the plot using the options panel.Users also have a theming option that they can choose which toggles the background of
-                    the plot making it easier to visualize outlier points and links.
-                </p>
-            </div>
-            <div class="section">
-                <h5>Linear Bar Plot</h5>
-                <div class="divider"></div>
-                <p>This plot visualises chromosomes as horizontal bars and connects genetically collinear regions between source and target regions with links. There are two levels of view for this plot a <b>whole genome level view</b> and a <b>chromosome level view</b>.
-                    The genome view uses colors to distniguish different chromosomes and can be used to see which source and target chromosomes share collinear regions.The width of the links represents the length of the sequences that are collinear.Hovering
-                    the mouse over a source chromosome displays all the links for which that chromosome is a source. Clicking on a source chromosome marker displays only the links emerging from that chromosome.Double clicking on any marker resets this
-                    effect. To investigate a region further users can click on a source chromosome and then click on a target chromosome to invoke the chromosome view for that particular source and target chromosome. The chromosome view uses colour to
-                    distniguish between a direct alignment and a reversed / flipped alignment. Users can use the mouse to zoom and pan the plot to investigate links.Hovering over a link also displays additional information regarding the link like the
-                    E value , match score and the count.Double clicking on a link highlights that particular link and hides all the other links. The reset icon at the top right corner can be used to reset the plot to its original state.
-                </p>
-
-                <h5>Dot Plot</h5>
-                <div class="divider"></div>
-                <p>A dot plot is simply the two dimensional representation of the similarity matrix between two sequences. The source chromosomes and target chromosomes are on the X and Y axes respectively and a link between two regions is represented by
-                    a dot.If the link is longer its represented by a line the length of which depends on the length of the match. This plot like the chromosome view in the linear Bar plot can be zoomed and panned for closer investigation.Hovering over
-                    a dot or a line shows the users additional information regarding that link.
-                </p>
-            </div>
-
-            <div class="section">
-                <p>We are working on adding several new features to this tool.The current development progress is documented <a href="https://trello.com/b/ag1Upk33/mcscanx-synteny-visualizer">here</a>.We are also working on offering users the ability to
-                    upload their own sequences.But for the time being we have loaded up several sample files as listed below :</p>
-                <ul>
-                    <li> <a href="https://kiranbandi.github.io/mcscanx-synteny-visualizer/?source=bn">Bn</a> - Brassica napus , Canola </li>
-                    <li> <a href="https://kiranbandi.github.io/mcscanx-synteny-visualizer/?source=at">At</a> - Arabidopsis thaliana ,Thale cress </li>
-                    <li> <a href="https://kiranbandi.github.io/mcscanx-synteny-visualizer/?source=os_sb">Os vs Sb</a> - Os(Oriza sativa, Rice) vs Sb(Sorghum bicolor , Corn)</li>
-                    <li> <a href="https://kiranbandi.github.io/mcscanx-synteny-visualizer/?source=at_vv">At vs Vv</a> - At(Arabidopsis thaliana, Thale cress) vs Vv(Vitis vinifera , Grape Vine)</li>
-                </ul>
-            </div>
-        </div>
-
-        <div id='tool-root' class='root-container'>
-            <div id='loader-container' class='col s12 center-align'>
-                <h4 class="red-text text-lighten-2 center-align section">Loading Data...</h4>
-                <div class="preloader-wrapper active">
-                    <div class="spinner-layer spinner-red-only">
-                        <div class="circle-clipper left">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="gap-patch">
-                            <div class="circle"></div>
-                        </div>
-                        <div class="circle-clipper right">
-                            <div class="circle"></div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div id='root'>
-            </div>
-        </div>
-
+        <div id='doc-root' class='root-container hide'></div>
+        <div id='tool-root' class='root-container'></div>
     </main>
     <!--JavaScript at end of body for optimized loading-->
     <script type="text/javascript" src="assets/materialize/js/materialize.min.js"></script>

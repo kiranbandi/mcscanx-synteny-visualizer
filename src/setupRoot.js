@@ -1,7 +1,14 @@
 import * as d3 from 'd3';
+import documentationTemplate from './template/documentation.html';
+import loaderTemplate from './template/loader.html';
 
 export default function() {
 
+    // load the documentation and loader template files
+    d3.select('#doc-root').html(documentationTemplate);
+    d3.select('#tool-root').append('div').html(loaderTemplate);
+
+    //materialize instantiate navbar
     document.addEventListener('DOMContentLoaded', function() {
         var elems = document.querySelectorAll('.sidenav');
         var instances = M.Sidenav.init(elems, {});

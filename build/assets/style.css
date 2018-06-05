@@ -133,3 +133,15 @@ body {
     bottom: 0;
     margin: auto;
 }
+
+.alignment-link-lines {
+    stroke: blue;
+}
+
+.darkPlot .alignment-link-lines {
+    stroke: #00deff;
+}
+
+#tool-root {
+    width: 100%;
+}
