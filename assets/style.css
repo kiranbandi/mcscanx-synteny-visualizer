@@ -24,7 +24,9 @@ body {
 .marker-source,
 .marker-text-source,
 .marker-target,
-.marker-text-target {
+.marker-text-target,
+.blockView-polylinks,
+.blockView-markers {
     cursor: pointer;
 }
 
@@ -73,14 +75,16 @@ body {
 
 .genomeViewSVG,
 .dotViewSVG,
-.chromosomeViewRootSVG {
+.chromosomeViewRootSVG,
+.blockViewRootSVG {
     margin: 20px auto 40px auto;
     display: block;
     border-radius: 1em;
 }
 
 .chromosomeViewRootSVG,
-.dotViewSVG {
+.dotViewSVG,
+.blockViewRootSVG {
     border: 2px solid silver;
 }
 
@@ -132,4 +136,16 @@ body {
     right: 0;
     bottom: 0;
     margin: auto;
+}
+
+.alignment-link-lines {
+    stroke: blue;
+}
+
+.darkPlot .alignment-link-lines {
+    stroke: #00deff;
+}
+
+#tool-root {
+    width: 100%;
 }
