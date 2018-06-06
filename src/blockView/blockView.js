@@ -16,7 +16,7 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         .text('Block View');
 
     let blockViewInfoContainer = blockViewContainer.append('div')
-        .attr('class', 'section center-align');
+        .attr('class', 'center-align');
 
     let alignmentInfo = [
         ['Source Chromosome', 'source'],
@@ -31,14 +31,13 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         .data(alignmentInfo)
         .enter()
         .append('h6')
-        .attr('class', 'blockViewSubHeader subInfoTitle blue-text')
+        .attr('class', 'blockViewSubHeader subInfoTitle blue-text text-darken-2')
         .text((d) => d[0] + ' : ' + alignment[d[1]]);
 
     let blockViewRootSVG = blockViewContainer
         .append('svg')
         .attr('class', 'blockViewRootSVG')
-        // temporarily hardcoded to 300 pixels
-        .attr('height', 320)
+        .attr('height', configuration.blockView.height)
         .attr('width', configuration.blockView.width)
         //set theming based on configuration params
         .classed('darkPlot', configuration.isDarkTheme);
@@ -49,8 +48,7 @@ export default function(container, configuration, alignment, genomeLibrary, chro
     let blockViewSVG = blockViewRootSVG
         .append('g')
         .attr('class', 'blockViewSVG')
-        // temporarily hardcoded to 300 pixels
-        .attr('height', 320)
+        .attr('height', configuration.blockView.height)
         .attr('width', configuration.blockView.width);
 
     // create an instance of d3 zoom
@@ -102,6 +100,7 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         })
 
     //Eventually need to also add ticks on the marker tracks here
+    // Code blurb for tick marks on the size use d3 custom markers
 
     // Find the marker positions 
     let markerPositions = _.map(alignment.links, (link) => {

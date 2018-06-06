@@ -18,8 +18,7 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
         genomeViewSVG = container
             .append('svg')
             .attr('class', 'genomeViewSVG')
-            // temporarily hardcoded to 425 pixels
-            .attr('height', 425)
+            .attr('height', configuration.genomeView.height)
             .attr('width', configuration.genomeView.width);
     }
 

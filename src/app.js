@@ -63,6 +63,7 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
                 'source': 50,
                 'target': 375
             },
+            'height': 425,
             'width': rootContainer.node().clientWidth,
         },
         'chromosomeView': {
@@ -71,13 +72,15 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
                 'target': 375
             },
             'markers': {},
+            'height': 425,
             'width': rootContainer.node().clientWidth,
         },
         'blockView': {
             'verticalPositions': {
-                'source': 60,
-                'target': 250
+                'source': 75,
+                'target': 300
             },
+            'height': 375,
             'width': rootContainer.node().clientWidth
         }
     };

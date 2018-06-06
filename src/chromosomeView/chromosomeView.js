@@ -30,8 +30,7 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
     let chromosomeViewRootSVG = chromosomeViewContainer
         .append('svg')
         .attr('class', 'chromosomeViewRootSVG')
-        // temporarily hardcoded to 425 pixels
-        .attr('height', 425)
+        .attr('height', configuration.chromosomeView.height)
         .attr('width', configuration.chromosomeView.width)
         //set theming based on configuration params
         .classed('darkPlot', configuration.isDarkTheme);
@@ -39,8 +38,7 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
     let chromosomeViewSVG = chromosomeViewRootSVG
         .append('g')
         .attr('class', 'chromosomeViewSVG')
-        // temporarily hardcoded to 425 pixels
-        .attr('height', 425)
+        .attr('height', configuration.chromosomeView.height)
         .attr('width', configuration.chromosomeView.width)
 
     // create an instance of d3 zoom
