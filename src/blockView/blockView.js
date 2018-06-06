@@ -24,7 +24,7 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         ['Alignment Type', 'type'],
         ['Alignment Count', 'count'],
         ['Alignment Score', 'score'],
-        ['Alignment Type', 'e_value']
+        ['E Value', 'e_value']
     ]
 
     blockViewInfoContainer.selectAll('.blockViewSubHeader')
