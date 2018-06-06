@@ -149,3 +149,11 @@ body {
 #tool-root {
     width: 100%;
 }
+
+polygon.blockView-polylinks {
+    opacity: 0.75;
+}
+
+polygon.blockView-polylinks:hover {
+    opacity: 1;
+}
