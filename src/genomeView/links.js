@@ -23,8 +23,8 @@ function initialiseLinks(configuration, alignmentList, genomeLibrary, chromosome
         let sourceChromosome = chromosomeMap.get(alignment.source),
             targetChromosome = chromosomeMap.get(alignment.target);
 
-        let sourceMarker = _.find(configuration.markerPositions.source, (o) => o.key == alignment.source),
-            targetMarker = _.find(configuration.markerPositions.target, (o) => o.key == alignment.target);
+        let sourceMarker = _.find(configuration.genomeView.markerPositions.source, (o) => o.key == alignment.source),
+            targetMarker = _.find(configuration.genomeView.markerPositions.target, (o) => o.key == alignment.target);
 
         let sourceGeneWidth = ((sourceGenes[1] - sourceGenes[0]) / (sourceChromosome.width)) * (sourceMarker.dx / 2),
             targetGeneWidth = ((targetGenes[1] - targetGenes[0]) / (targetChromosome.width)) * (targetMarker.dx / 2),
@@ -37,11 +37,11 @@ function initialiseLinks(configuration, alignmentList, genomeLibrary, chromosome
         return {
             source: {
                 'x': sourceMarker.x + sourceX + linkWidth,
-                'y': configuration.verticalPositions.source + 10
+                'y': configuration.genomeView.verticalPositions.source + 10
             },
             target: {
                 'x': targetMarker.x + targetX + linkWidth,
-                'y': configuration.verticalPositions.target - 10
+                'y': configuration.genomeView.verticalPositions.target - 10
             },
             alignment,
             width: linkWidth

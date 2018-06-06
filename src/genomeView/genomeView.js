@@ -20,20 +20,22 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
             .attr('class', 'genomeViewSVG')
             // temporarily hardcoded to 425 pixels
             .attr('height', 425)
-            .attr('width', configuration.width);
+            .attr('width', configuration.genomeView.width);
     }
 
     //set theming based on configuration params
     genomeViewSVG.classed('darkPlot', configuration.isDarkTheme);
 
-    // clear existing chromosomeView assets if any
+    // clear existing chromosomeView or BlockView assets if any
     container.select('.chromosomeViewContainer').remove();
+    container.select('.blockViewContainer').remove();
 
     if (configuration.markers.source.length == 0 || configuration.markers.target.length == 0) {
         genomeViewSVG.classed('hide', true);
         container.select('.chromosomeViewSVG').classed('hide', true);
         genomeViewHeader.text("Source or Target Empty");
     } else if (configuration.markers.source.length == 1 && configuration.markers.target.length == 1) {
+        configuration.chromosomeView.markers = configuration.markers;
         chromosomeView(container, configuration, alignmentList, genomeLibrary, chromosomeMap);
     } else {
 
@@ -41,13 +43,11 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
         genomeViewHeader.text("Genome View");
 
         configuration = markerSetup(genomeViewSVG, configuration, chromosomeMap, function(sourceMarkerID, targetMarkerID) {
-            configuration.markers = { 'source': [sourceMarkerID], 'target': [targetMarkerID] };
+            configuration.chromosomeView.markers = { 'source': [sourceMarkerID], 'target': [targetMarkerID] };
             // process alignments for selected markers
-            let updatedAlignmentList = processAlignment(configuration.markers, alignmentList);
+            let updatedAlignmentList = processAlignment(configuration.chromosomeView.markers, alignmentList);
             chromosomeView(container, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
         });
-
         linkSetup(genomeViewSVG, configuration, alignmentList, chromosomeMap, genomeLibrary);
     }
-
 }

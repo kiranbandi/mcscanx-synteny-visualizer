@@ -1,23 +1,16 @@
 import _ from 'lodash';
 import * as d3 from 'd3';
 
-// variable scope blocked locally
-let currentClickState;
 
 export default function(svg, configuration, chromosomeCollection, chromosomeViewCallback) {
-    currentClickState = {
-        'clicked': false,
-        'sourceMarkerId': -1,
-        'targetMarkerId': -1
-    }
-    configuration.markerPositions = initialiseMarkers(configuration, chromosomeCollection);
+    configuration.chromosomeView.markerPositions = initialiseMarkers(configuration, chromosomeCollection);
     drawMarkers(svg, configuration, chromosomeViewCallback);
     return configuration;
 }
 
 function initialiseMarkers(configuration, chromosomeCollection) {
 
-    let maxWidthAvailable = configuration.width;
+    let maxWidthAvailable = configuration.chromosomeView.width;
     // To arrange the markers in a proper way we find the marker List that has the maximum genome width
     //  We need this to fit in the maximum available width so we use this and find the scale factor 
     // we then fit all the other markers using the same scale factors
@@ -25,7 +18,7 @@ function initialiseMarkers(configuration, chromosomeCollection) {
     //  fit relative to the webpage width
 
     // find the widths for each marker list 
-    let widthCollection = _.map(configuration.markers, (chromosomeList, markerId) => {
+    let widthCollection = _.map(configuration.chromosomeView.markers, (chromosomeList, markerId) => {
         // for each list we calculate the sum of all the widths of chromosomes in it 
         return { markerId: markerId, width: _.sumBy(chromosomeList, (key) => chromosomeCollection.get(key).width) };
     })
@@ -34,13 +27,13 @@ function initialiseMarkers(configuration, chromosomeCollection) {
     let maxGeneticWidthMarkerList = _.maxBy(widthCollection, (o) => o.width);
 
     //  we use 90% of the available width for the actual markers and the remaining 10% is used as padding between the markers 
-    let scaleFactor = (configuration.width * 0.80) / maxGeneticWidthMarkerList.width;
+    let scaleFactor = (configuration.chromosomeView.width * 0.80) / maxGeneticWidthMarkerList.width;
 
     // no we initialise the markers and set the width directly on the markers lists directly 
     let markers = {};
-    _.each(configuration.markers, (chromosomeList, markerId) => {
+    _.each(configuration.chromosomeView.markers, (chromosomeList, markerId) => {
         // the remaining width is 20% for the maximum width marker list but will change for others
-        let remainingWidth = (configuration.width - (_.find(widthCollection, (o) => o.markerId == markerId).width * scaleFactor)),
+        let remainingWidth = (configuration.chromosomeView.width - (_.find(widthCollection, (o) => o.markerId == markerId).width * scaleFactor)),
             markerPadding = remainingWidth / (chromosomeList.length),
             widthUsedSoFar = 0,
             markerList = _.map(chromosomeList, (key, index) => {
@@ -72,7 +65,7 @@ function drawMarkers(svg, configuration, chromosomeViewCallback) {
             .attr('class', 'markerContainer');
     }
 
-    _.map(configuration.markerPositions, (markerList, markerListId) => {
+    _.map(configuration.chromosomeView.markerPositions, (markerList, markerListId) => {
 
         let markerLines = markerContainer
             .selectAll('.marker-' + markerListId)
@@ -91,7 +84,7 @@ function drawMarkers(svg, configuration, chromosomeViewCallback) {
             })
             .style('stroke', (d, i) => {
                 if (markerListId == 'source') {
-                    let sourceIndex = configuration.markers.source.indexOf(d.key);
+                    let sourceIndex = configuration.chromosomeView.markers.source.indexOf(d.key);
                     return ((sourceIndex == -1) || sourceIndex > 9) ? '#808080' : d3.schemeCategory10[sourceIndex];
 
                     return d3.schemeCategory10[i];
@@ -104,11 +97,11 @@ function drawMarkers(svg, configuration, chromosomeViewCallback) {
             .attr('x1', (d) => {
                 return d.x;
             })
-            .attr('y1', configuration.verticalPositions[markerListId])
+            .attr('y1', configuration.chromosomeView.verticalPositions[markerListId])
             .attr('x2', (d) => {
                 return (d.x + d.dx);
             })
-            .attr('y2', configuration.verticalPositions[markerListId]);
+            .attr('y2', configuration.chromosomeView.verticalPositions[markerListId]);
 
         let markerTextUnits = markerContainer
             .selectAll('.marker-text-' + markerListId)
@@ -124,47 +117,7 @@ function drawMarkers(svg, configuration, chromosomeViewCallback) {
             .attr('x', function(d) {
                 return d.x + (d.dx / 2) - (this.getBoundingClientRect().width / 2);
             })
-            .attr('y', configuration.verticalPositions[markerListId] + 5);
+            .attr('y', configuration.chromosomeView.verticalPositions[markerListId] + 5);
     })
 
-}
-
-function markerHover(d) {
-    if (this.markerListId == 'source' && !currentClickState.clicked) {
-        d3.selectAll(".chromosomeViewRootSVG .link").classed('hiddenLink', true);
-        d3.selectAll('.chromosomeViewRootSVG .link-source-' + d.key).classed('activeLink', true);
-    }
-}
-
-function markerOut(d) {
-    if (this.markerListId == 'source' && !currentClickState.clicked) {
-        d3.selectAll('.chromosomeViewRootSVG .hiddenLink').classed('hiddenLink', false);
-        d3.selectAll('.chromosomeViewRootSVG .activeLink').classed('activeLink', false);
-    }
-}
-
-function markerClick(d) {
-    if (this.markerListId == 'source') {
-        // reset other active links if any 
-        d3.selectAll('.chromosomeViewRootSVG .hiddenLink').classed('hiddenLink', false);
-        d3.selectAll('.chromosomeViewRootSVG .activeLink').classed('activeLink', false);
-        // set current source links to active
-        d3.selectAll(".chromosomeViewRootSVG .link").classed('hiddenLink', true);
-        d3.selectAll('.chromosomeViewRootSVG .link-source-' + d.key).classed('activeLink', true);
-        currentClickState.clicked = true;
-        currentClickState.sourceMarkerId = d.key;
-    } else if (this.markerListId == 'target' && currentClickState.sourceMarkerId != -1) {
-        currentClickState.targetMarkerId = d.key;
-        this.chromosomeViewCallback(currentClickState.sourceMarkerId, currentClickState.targetMarkerId);
-    }
-}
-
-function resetClick() {
-    currentClickState = {
-        'clicked': false,
-        'sourceMarkerId': -1,
-        'targetMarkerId': -1
-    };
-    d3.selectAll('.chromosomeViewRootSVG .hiddenLink').classed('hiddenLink', false);
-    d3.selectAll('.chromosomeViewRootSVG .activeLink').classed('activeLink', false);
 }

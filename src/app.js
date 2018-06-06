@@ -53,14 +53,31 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
     // markerPositions and links are populated  
     // need to reconfigure seperately for each plot indivually at some point in the not so far future
     let configuration = {
-        'width': rootContainer.node().clientWidth,
         'isDarkTheme': false, // default theme is light 
-        'verticalPositions': {
-            'source': 50,
-            'target': 375
-        },
         'markers': sampleSourceMapper[sourceName], // default preset markers are loaded from the sampleSourceMapper
         'dotView': {
+            'width': rootContainer.node().clientWidth
+        },
+        'genomeView': {
+            'verticalPositions': {
+                'source': 50,
+                'target': 375
+            },
+            'width': rootContainer.node().clientWidth,
+        },
+        'chromosomeView': {
+            'verticalPositions': {
+                'source': 50,
+                'target': 375
+            },
+            'markers': {},
+            'width': rootContainer.node().clientWidth,
+        },
+        'blockView': {
+            'verticalPositions': {
+                'source': 50,
+                'target': 250
+            },
             'width': rootContainer.node().clientWidth
         }
     };

@@ -10,14 +10,14 @@ export default function(svg, configuration, chromosomeCollection, chromosomeView
         'sourceMarkerId': -1,
         'targetMarkerId': -1
     }
-    configuration.markerPositions = initialiseMarkers(configuration, chromosomeCollection);
+    configuration.genomeView.markerPositions = initialiseMarkers(configuration, chromosomeCollection);
     drawMarkers(svg, configuration, chromosomeViewCallback);
     return configuration;
 }
 
 function initialiseMarkers(configuration, chromosomeCollection) {
 
-    let maxWidthAvailable = configuration.width;
+    let maxWidthAvailable = configuration.genomeView.width;
     // To arrange the markers in a proper way we find the marker List that has the maximum genome width
     //  We need this to fit in the maximum available width so we use this and find the scale factor 
     // we then fit all the other markers using the same scale factors
@@ -34,13 +34,13 @@ function initialiseMarkers(configuration, chromosomeCollection) {
     let maxGeneticWidthMarkerList = _.maxBy(widthCollection, (o) => o.width);
 
     //  we use 90% of the available width for the actual markers and the remaining 10% is used as padding between the markers 
-    let scaleFactor = (configuration.width * 0.80) / maxGeneticWidthMarkerList.width;
+    let scaleFactor = (configuration.genomeView.width * 0.80) / maxGeneticWidthMarkerList.width;
 
     // no we initialise the markers and set the width directly on the markers lists directly 
     let markers = {};
     _.each(configuration.markers, (chromosomeList, markerId) => {
         // the remaining width is 20% for the maximum width marker list but will change for others
-        let remainingWidth = (configuration.width - (_.find(widthCollection, (o) => o.markerId == markerId).width * scaleFactor)),
+        let remainingWidth = (configuration.genomeView.width - (_.find(widthCollection, (o) => o.markerId == markerId).width * scaleFactor)),
             markerPadding = remainingWidth / (chromosomeList.length),
             widthUsedSoFar = 0,
             markerList = _.map(chromosomeList, (key, index) => {
@@ -72,7 +72,7 @@ function drawMarkers(svg, configuration, chromosomeViewCallback) {
             .attr('class', 'markerContainer');
     }
 
-    _.map(configuration.markerPositions, (markerList, markerListId) => {
+    _.map(configuration.genomeView.markerPositions, (markerList, markerListId) => {
 
         let markerLines = markerContainer
             .selectAll('.marker-' + markerListId)
@@ -108,11 +108,11 @@ function drawMarkers(svg, configuration, chromosomeViewCallback) {
             .attr('x1', (d) => {
                 return d.x;
             })
-            .attr('y1', configuration.verticalPositions[markerListId])
+            .attr('y1', configuration.genomeView.verticalPositions[markerListId])
             .attr('x2', (d) => {
                 return (d.x + d.dx);
             })
-            .attr('y2', configuration.verticalPositions[markerListId]);
+            .attr('y2', configuration.genomeView.verticalPositions[markerListId]);
 
         let markerTextUnits = markerContainer
             .selectAll('.marker-text-' + markerListId)
@@ -128,7 +128,7 @@ function drawMarkers(svg, configuration, chromosomeViewCallback) {
             .attr('x', function(d) {
                 return d.x + (d.dx / 2) - (this.getBoundingClientRect().width / 2);
             })
-            .attr('y', configuration.verticalPositions[markerListId] + 5)
+            .attr('y', configuration.genomeView.verticalPositions[markerListId] + 5)
             .on('mouseover', markerHover.bind({ markerListId }))
             .on('mouseout', markerOut.bind({ markerListId }))
             .on('click', markerClick.bind({ markerListId, chromosomeViewCallback }))

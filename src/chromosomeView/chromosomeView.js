@@ -2,6 +2,7 @@ import * as d3 from 'd3';
 import markerSetup from './markers';
 import linkSetup from './links';
 import linkLegends from './linkLegends';
+import blockView from '../blockView/blockView';
 
 export default function(container, configuration, alignmentList, genomeLibrary, chromosomeMap) {
 
@@ -16,31 +17,31 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
         .attr('class', 'chromosomeViewContainer');
 
     chromosomeViewContainer.append('h4')
-        .attr('class', 'genomeViewHeader red-text text-lighten-2 center-align')
+        .attr('class', 'chromosomeViewHeader red-text text-lighten-2 center-align')
         .text('Chromosome View');
-
-    // change header text to chromosome view
-    chromosomeViewContainer.select('.genomeViewHeader').text('Chromosome View');
 
     // Add Legend to Chromosome View
     let chromosomeLegend = chromosomeViewContainer.append('div').attr('class', 'chromosomeLegend');
     linkLegends(chromosomeLegend);
+
+    // Clear block View if any exists
+    container.select('.blockViewContainer').remove();
 
     let chromosomeViewRootSVG = chromosomeViewContainer
         .append('svg')
         .attr('class', 'chromosomeViewRootSVG')
         // temporarily hardcoded to 425 pixels
         .attr('height', 425)
-        .attr('width', configuration.width);
+        .attr('width', configuration.chromosomeView.width)
+        //set theming based on configuration params
+        .classed('darkPlot', configuration.isDarkTheme);
 
     let chromosomeViewSVG = chromosomeViewRootSVG
         .append('g')
         .attr('class', 'chromosomeViewSVG')
         // temporarily hardcoded to 425 pixels
         .attr('height', 425)
-        .attr('width', configuration.width)
-        //set theming based on configuration params
-        .classed('darkPlot', configuration.isDarkTheme);
+        .attr('width', configuration.chromosomeView.width)
 
     // create an instance of d3 zoom
     let zoomInstance = d3.zoom()
@@ -53,14 +54,16 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
     chromosomeViewRootSVG.call(zoomInstance);
 
     let markerConfiguration = markerSetup(chromosomeViewSVG, configuration, chromosomeMap);
-    linkSetup(chromosomeViewSVG, markerConfiguration, alignmentList, chromosomeMap, genomeLibrary, zoomInstance);
+    linkSetup(chromosomeViewSVG, markerConfiguration, alignmentList, chromosomeMap, genomeLibrary, zoomInstance, (linkData) => {
+        blockView(container, configuration, linkData, genomeLibrary, chromosomeMap);
+    });
 
     // reset button 
     chromosomeViewRootSVG
         .append('rect')
         .attr('class', 'chromosomeViewReset')
         .style('cursor', 'pointer')
-        .attr('x', configuration.width - 50)
+        .attr('x', configuration.chromosomeView.width - 50)
         .attr('y', 20)
         .attr('height', 24)
         .attr('width', 24)
@@ -70,7 +73,7 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
     // icon for reset button
     chromosomeViewRootSVG
         .append('svg')
-        .attr('x', configuration.width - 50)
+        .attr('x', configuration.chromosomeView.width - 50)
         .attr('y', 20)
         .append('path')
         .style('cursor', 'pointer')
@@ -84,5 +87,4 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
         d3.selectAll('.chromosomeViewRootSVG .hiddenLink').classed('hiddenLink', false);
         d3.selectAll('.chromosomeViewRootSVG .activeLink').classed('activeLink', false);
     }
-
 }

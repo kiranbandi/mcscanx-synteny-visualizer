@@ -1,11 +1,9 @@
 import _ from 'lodash';
 import * as d3 from 'd3';
 
-export default function(svg, configuration, alignmentList, chromosomeMap, genomeLibrary, zoomInstance) {
-
+export default function(svg, configuration, alignmentList, chromosomeMap, genomeLibrary, zoomInstance, linkdblClickCallback) {
     let links = initialiseLinks(configuration, alignmentList, genomeLibrary, chromosomeMap);
-    drawLinks(svg, links, configuration, zoomInstance);
-
+    drawLinks(svg, links, zoomInstance, linkdblClickCallback);
 }
 
 function initialiseLinks(configuration, alignmentList, genomeLibrary, chromosomeMap) {
@@ -25,8 +23,8 @@ function initialiseLinks(configuration, alignmentList, genomeLibrary, chromosome
         let sourceChromosome = chromosomeMap.get(alignment.source),
             targetChromosome = chromosomeMap.get(alignment.target);
 
-        let sourceMarker = _.find(configuration.markerPositions.source, (o) => o.key == alignment.source),
-            targetMarker = _.find(configuration.markerPositions.target, (o) => o.key == alignment.target);
+        let sourceMarker = _.find(configuration.chromosomeView.markerPositions.source, (o) => o.key == alignment.source),
+            targetMarker = _.find(configuration.chromosomeView.markerPositions.target, (o) => o.key == alignment.target);
 
         let sourceGeneWidth = ((sourceGenes[1] - sourceGenes[0]) / (sourceChromosome.width)) * (sourceMarker.dx / 2),
             targetGeneWidth = ((targetGenes[1] - targetGenes[0]) / (targetChromosome.width)) * (targetMarker.dx / 2),
@@ -39,11 +37,11 @@ function initialiseLinks(configuration, alignmentList, genomeLibrary, chromosome
         return {
             source: {
                 'x': sourceMarker.x + sourceX + linkWidth,
-                'y': configuration.verticalPositions.source + 10
+                'y': configuration.chromosomeView.verticalPositions.source + 10
             },
             target: {
                 'x': targetMarker.x + targetX + linkWidth,
-                'y': configuration.verticalPositions.target - 10
+                'y': configuration.chromosomeView.verticalPositions.target - 10
             },
             alignment,
             width: linkWidth
@@ -52,7 +50,7 @@ function initialiseLinks(configuration, alignmentList, genomeLibrary, chromosome
 }
 
 
-function drawLinks(svg, links, configuration, zoomInstance) {
+function drawLinks(svg, links, zoomInstance, linkdblClickCallback) {
 
     let linkContainer = svg.select('.linkContainer');
 
@@ -91,6 +89,7 @@ function drawLinks(svg, links, configuration, zoomInstance) {
             d3.selectAll(".chromosomeViewRootSVG .link").classed('hiddenLink', true);
             d3.select(this).classed('activeLink', true);
             svg.call(zoomInstance.transform, d3.zoomIdentity.scale(1).translate(0, 0));
+            linkdblClickCallback(d.alignment);
         })
         // title is an SVG standard way of providing tooltips, up to the browser how to render this, so changing the style is tricky
         .append('title')
