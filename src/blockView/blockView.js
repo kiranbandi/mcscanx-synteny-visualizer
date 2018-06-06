@@ -15,6 +15,25 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         .attr('class', 'blockViewHeader red-text text-lighten-2 center-align')
         .text('Block View');
 
+    let blockViewInfoContainer = blockViewContainer.append('div')
+        .attr('class', 'section center-align');
+
+    let alignmentInfo = [
+        ['Source Chromosome', 'source'],
+        ['Target Chromosome', 'target'],
+        ['Alignment Type', 'type'],
+        ['Alignment Count', 'count'],
+        ['Alignment Score', 'score'],
+        ['Alignment Type', 'e_value']
+    ]
+
+    blockViewInfoContainer.selectAll('.blockViewSubHeader')
+        .data(alignmentInfo)
+        .enter()
+        .append('h6')
+        .attr('class', 'blockViewSubHeader subInfoTitle blue-text')
+        .text((d) => d[0] + ' : ' + alignment[d[1]]);
+
     let blockViewRootSVG = blockViewContainer
         .append('svg')
         .attr('class', 'blockViewRootSVG')
