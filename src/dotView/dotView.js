@@ -2,8 +2,9 @@ import * as d3 from 'd3';
 import _ from 'lodash';
 import axisLines from './axisLines';
 import linkPoints from './linkPoints';
+import blockView from '../blockView/blockView';
 
-export default function(container, configuration, alignmentList, genomeLibrary, chromosomeMap) {
+export default function(container, configuration, alignmentList, genomeLibrary, chromosomeMap, linkdblClickCallback) {
 
     let side_margin = 75,
         dotViewSVG = container.select('.dotViewSVG'),
@@ -48,8 +49,13 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
 
     dotViewSVG.call(zoomInstance);
 
+    // Clear block View if any exists
+    container.select('.blockViewContainer').remove();
+
     let linePositions = axisLines(dotInnerSVG, configuration, chromosomeMap);
-    linkPoints(dotInnerSVG, configuration, chromosomeMap, alignmentList, genomeLibrary, linePositions);
+    linkPoints(dotInnerSVG, configuration, chromosomeMap, alignmentList, genomeLibrary, linePositions, function(linkData) {
+        blockView(container, configuration, linkData, genomeLibrary, chromosomeMap);
+    });
 
     // reset button 
     dotViewSVG

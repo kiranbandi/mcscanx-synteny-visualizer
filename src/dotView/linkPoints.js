@@ -1,7 +1,7 @@
 import _ from 'lodash';
 import * as d3 from 'd3';
 
-export default function(svg, configuration, chromosomeMap, alignmentList, genomeLibrary, linePositions) {
+export default function(svg, configuration, chromosomeMap, alignmentList, genomeLibrary, linePositions, linkdblClickCallback) {
 
     let alignmentLinePositions = _.map(alignmentList, (alignment, index) => {
 
@@ -44,6 +44,9 @@ export default function(svg, configuration, chromosomeMap, alignmentList, genome
         .attr('x2', (d) => d.x2)
         .attr('y1', (d) => d.y1)
         .attr('y2', (d) => d.y2)
+        .on('dblclick', function(d) {
+            linkdblClickCallback(d.alignment);
+        })
 
     // title is an SVG standard way of providing tooltips, up to the browser how to render this, so changing the style is tricky
     alignmentLines.append('title')

@@ -24,7 +24,9 @@ body {
 .marker-source,
 .marker-text-source,
 .marker-target,
-.marker-text-target {
+.marker-text-target,
+.blockView-polylinks,
+.blockView-markers {
     cursor: pointer;
 }
 

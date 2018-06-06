@@ -75,7 +75,7 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         },
         'blockView': {
             'verticalPositions': {
-                'source': 50,
+                'source': 60,
                 'target': 250
             },
             'width': rootContainer.node().clientWidth
