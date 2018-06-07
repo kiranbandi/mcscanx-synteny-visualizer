@@ -63,18 +63,6 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         .attr('height', configuration.blockView.height)
         .attr('width', configuration.blockView.innerWidth);
 
-
-    // create an instance of d3 zoom
-    let zoomInstance = d3.zoom()
-        .filter(() => !(d3.event.type == 'mouseover'))
-        .scaleExtent([1, 10])
-        .on("zoom", () => {
-            blockViewSVG.style("transform", "translate(" + d3.event.transform.x + "px," + "0px) scale(" + d3.event.transform.k + ",1)");
-        });
-
-    blockViewOuterSVG.call(zoomInstance);
-
-
     let firstLink = alignment.links[0],
         lastLink = alignment.links[alignment.links.length - 1],
         sourceGenes = genomeLibrary.get(firstLink.source).start < genomeLibrary.get(lastLink.source).start ? [firstLink.source, lastLink.source] : [lastLink.source, firstLink.source],
@@ -87,6 +75,45 @@ export default function(container, configuration, alignment, genomeLibrary, chro
             'start': genomeLibrary.get(targetGenes[0]).start,
             'end': genomeLibrary.get(targetGenes[1]).end,
         };
+
+    var x_top = d3.scaleLinear()
+        .domain([sourceTrack.start, sourceTrack.end])
+        .range([0, configuration.blockView.innerWidth]);
+
+    var xAxis_top = d3.axisTop(x_top)
+        .ticks(10)
+        .tickPadding(5);
+
+    var gX_top = blockViewOuterSVG.append("g")
+        .style('transform', 'translate(0px,40px)')
+        .attr("class", "axis axis--x")
+        .call(xAxis_top);
+
+    var x_bottom = d3.scaleLinear()
+        .domain([targetTrack.start, targetTrack.end])
+        .range([0, configuration.blockView.innerWidth]);
+
+    var xAxis_bottom = d3.axisBottom(x_bottom)
+        .ticks(10)
+        .tickPadding(5);
+
+    var gX_bottom = blockViewOuterSVG.append("g")
+        .style('transform', 'translate(0px,' + (configuration.blockView.height - 40) + 'px)')
+        .attr("class", "axis axis--x target-xaxis")
+        .call(xAxis_bottom);
+
+    // create an instance of d3 zoom
+    let zoomInstance = d3.zoom()
+        .filter(() => !(d3.event.type == 'mouseover'))
+        .scaleExtent([1, 10])
+        .on("zoom", () => {
+            blockViewSVG.style("transform", "translate(" + d3.event.transform.x + "px," + "0px) scale(" + d3.event.transform.k + ",1)");
+            gX_top.call(xAxis_top.scale(d3.event.transform.rescaleX(x_top)));
+            gX_bottom.call(xAxis_bottom.scale(d3.event.transform.rescaleX(x_bottom)));
+        });
+
+    blockViewOuterSVG.call(zoomInstance);
+
 
     let targetScalingFactor = configuration.blockView.innerWidth / (targetTrack.end - targetTrack.start),
         sourceScalingFactor = configuration.blockView.innerWidth / (sourceTrack.end - sourceTrack.start);
@@ -254,6 +281,10 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         d3.event.stopPropagation();
         invertTarget(this.targetMarkers, this.polygonLinks, this.configuration);
     }
+
+
+
+
 
 }
 

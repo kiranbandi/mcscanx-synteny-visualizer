@@ -157,3 +157,15 @@ polygon.blockView-polylinks {
 polygon.blockView-polylinks:hover {
     opacity: 1;
 }
+
+.axis--x text {
+    fill: grey;
+}
+
+.axis--x path {
+    stroke: grey;
+}
+
+.axis--x line {
+    stroke: grey;
+}

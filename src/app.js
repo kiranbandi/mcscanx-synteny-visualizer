@@ -77,10 +77,10 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         },
         'blockView': {
             'verticalPositions': {
-                'source': 0,
-                'target': 225
+                'source': 50,
+                'target': 275
             },
-            'height': 275,
+            'height': 325,
             'width': rootContainer.node().clientWidth
         }
     };
