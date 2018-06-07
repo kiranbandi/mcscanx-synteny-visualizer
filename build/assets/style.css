@@ -76,7 +76,7 @@ body {
 .genomeViewSVG,
 .dotViewSVG,
 .chromosomeViewRootSVG,
-.blockViewRootSVG {
+.blockViewRoot {
     margin: 20px auto 40px auto;
     display: block;
     border-radius: 1em;
@@ -84,7 +84,7 @@ body {
 
 .chromosomeViewRootSVG,
 .dotViewSVG,
-.blockViewRootSVG {
+.blockViewRoot {
     border: 2px solid silver;
 }
 

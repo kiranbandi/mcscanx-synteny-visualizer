@@ -34,30 +34,45 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         .attr('class', 'blockViewSubHeader subInfoTitle blue-text text-darken-2')
         .text((d) => d[0] + ' : ' + alignment[d[1]]);
 
-    let blockViewRootSVG = blockViewContainer
-        .append('svg')
-        .attr('class', 'blockViewRootSVG')
-        .attr('height', configuration.blockView.height)
+    let blockViewRoot = blockViewContainer
+        .append('div')
+        .attr('class', 'blockViewRoot')
+        .attr('height', configuration.blockView.height + 60)
         .attr('width', configuration.blockView.width)
         //set theming based on configuration params
         .classed('darkPlot', configuration.isDarkTheme);
 
+    let blockViewTopSVG = blockViewRoot
+        .append('svg')
+        .attr('height', 60)
+        .attr('width', configuration.blockView.width)
+
     configuration.blockView.innerWidth = configuration.blockView.width * 0.80;
     configuration.blockView.leftOffeset = configuration.blockView.width * 0.10;
 
-    let blockViewSVG = blockViewRootSVG
+    let blockViewOuterSVG = blockViewRoot
+        .append('svg')
+        .attr('class', 'blockViewOuterSVG')
+        .attr('height', configuration.blockView.height)
+        .attr('width', configuration.blockView.innerWidth)
+        .style('transform', 'translate(' + configuration.blockView.leftOffeset + 'px,0px)')
+
+    let blockViewSVG = blockViewOuterSVG
         .append('g')
         .attr('class', 'blockViewSVG')
         .attr('height', configuration.blockView.height)
-        .attr('width', configuration.blockView.width);
+        .attr('width', configuration.blockView.innerWidth);
+
 
     // create an instance of d3 zoom
     let zoomInstance = d3.zoom()
+        .filter(() => !(d3.event.type == 'mouseover'))
         .scaleExtent([1, 10])
         .on("zoom", () => {
             blockViewSVG.style("transform", "translate(" + d3.event.transform.x + "px," + "0px) scale(" + d3.event.transform.k + ",1)");
         });
-    blockViewRootSVG.call(zoomInstance);
+
+    blockViewOuterSVG.call(zoomInstance);
 
 
     let firstLink = alignment.links[0],
@@ -73,8 +88,8 @@ export default function(container, configuration, alignment, genomeLibrary, chro
             'end': genomeLibrary.get(targetGenes[1]).end,
         };
 
-    let maxWidthInBasePairs = Math.max((sourceTrack.end - sourceTrack.start), (targetTrack.end - targetTrack.start)),
-        scalingFactor = configuration.blockView.innerWidth / maxWidthInBasePairs;
+    let targetScalingFactor = configuration.blockView.innerWidth / (targetTrack.end - targetTrack.start),
+        sourceScalingFactor = configuration.blockView.innerWidth / (sourceTrack.end - sourceTrack.start);
 
     // Make tracks for source and target 
     let markerTracks = blockViewSVG
@@ -88,12 +103,12 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         })
         .style('opacity', '0.5')
         .style('stroke-width', '20px')
-        .attr('x1', configuration.blockView.leftOffeset)
+        .attr('x1', 0)
         .attr('y1', (d) => {
             return d == 0 ? configuration.blockView.verticalPositions['source'] : configuration.blockView.verticalPositions['target']
         })
         .attr('x2', (d) => {
-            return configuration.blockView.leftOffeset + configuration.blockView.innerWidth;
+            return configuration.blockView.innerWidth;
         })
         .attr('y2', (d) => {
             return d == 0 ? configuration.blockView.verticalPositions['source'] : configuration.blockView.verticalPositions['target']
@@ -111,13 +126,13 @@ export default function(container, configuration, alignment, genomeLibrary, chro
 
         return {
             source: {
-                'x1': configuration.blockView.leftOffeset + ((sourceGene.start - sourceTrack.start) * scalingFactor),
-                'x2': configuration.blockView.leftOffeset + ((sourceGene.end - sourceTrack.start) * scalingFactor),
+                'x1': ((sourceGene.start - sourceTrack.start) * sourceScalingFactor),
+                'x2': ((sourceGene.end - sourceTrack.start) * sourceScalingFactor),
                 'y': configuration.blockView.verticalPositions.source
             },
             target: {
-                'x1': configuration.blockView.leftOffeset + ((targetGene.start - targetTrack.start) * scalingFactor),
-                'x2': configuration.blockView.leftOffeset + ((targetGene.end - targetTrack.start) * scalingFactor),
+                'x1': ((targetGene.start - targetTrack.start) * targetScalingFactor),
+                'x2': ((targetGene.end - targetTrack.start) * targetScalingFactor),
                 'y': configuration.blockView.verticalPositions.target
             },
             link
@@ -183,7 +198,7 @@ export default function(container, configuration, alignment, genomeLibrary, chro
 
 
     // reset button 
-    blockViewRootSVG
+    blockViewTopSVG
         .append('rect')
         .attr('class', 'blockViewReset')
         .style('cursor', 'pointer')
@@ -195,7 +210,7 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         .on('click', resetEffects.bind(this));
 
     // icon for reset button
-    blockViewRootSVG
+    blockViewTopSVG
         .append('svg')
         .attr('x', configuration.blockView.width - 50)
         .attr('y', 20)
@@ -208,7 +223,7 @@ export default function(container, configuration, alignment, genomeLibrary, chro
 
 
     // invert button 
-    blockViewRootSVG
+    blockViewTopSVG
         .append('rect')
         .attr('class', 'blockViewInvert')
         .style('cursor', 'pointer')
@@ -220,7 +235,7 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         .on('click', invertTargetClick.bind({ targetMarkers, polygonLinks, configuration }));
 
     // icon for reset button
-    blockViewRootSVG
+    blockViewTopSVG
         .append('svg')
         .attr('x', configuration.blockView.width - 110)
         .attr('y', 20)
@@ -232,7 +247,7 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         .on('click', invertTargetClick.bind({ targetMarkers, polygonLinks, configuration }));
 
     function resetEffects() {
-        blockViewRootSVG.call(zoomInstance.transform, d3.zoomIdentity.scale(1).translate(0, 0));
+        blockViewOuterSVG.call(zoomInstance.transform, d3.zoomIdentity.scale(1).translate(0, 0));
     }
 
     function invertTargetClick() {
@@ -248,10 +263,10 @@ function invertTarget(markers, polygons, configuration) {
         .transition()
         .duration(500)
         .attr('x1', function(d) {
-            return configuration.blockView.width - d3.select(this).attr('x1');
+            return configuration.blockView.innerWidth - d3.select(this).attr('x1');
         })
         .attr('x2', function(d) {
-            return configuration.blockView.width - d3.select(this).attr('x2');
+            return configuration.blockView.innerWidth - d3.select(this).attr('x2');
         })
 
     // draw all source markers
@@ -263,8 +278,8 @@ function invertTarget(markers, polygons, configuration) {
                 third_vertex_coordinates = currentPoints[2].split(","),
                 fourth_vertex_coordinates = currentPoints[3].split(",");
 
-            third_vertex_coordinates[0] = configuration.blockView.width - third_vertex_coordinates[0];
-            fourth_vertex_coordinates[0] = configuration.blockView.width - fourth_vertex_coordinates[0];
+            third_vertex_coordinates[0] = configuration.blockView.innerWidth - third_vertex_coordinates[0];
+            fourth_vertex_coordinates[0] = configuration.blockView.innerWidth - fourth_vertex_coordinates[0];
 
             return currentPoints[0] +
                 " " + currentPoints[1] +
