@@ -282,10 +282,6 @@ export default function(container, configuration, alignment, genomeLibrary, chro
         invertTarget(this.targetMarkers, this.polygonLinks, this.configuration);
     }
 
-
-
-
-
 }
 
 function invertTarget(markers, polygons, configuration) {
