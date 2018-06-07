@@ -9,7 +9,7 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
 
     let genomeViewSVG = container.select('.genomeViewSVG'),
         genomeViewHeader = container.select('.genomeViewHeader'),
-        genomeViewFilterHeader = container.select('genomeViewFilterHeader');
+        genomeViewFilterHeader = container.select('.genomeViewFilterHeader');
 
     // if svg doesnt exist create it 
     if (!genomeViewSVG.node()) {
@@ -24,8 +24,8 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
             .attr('width', configuration.genomeView.width);
 
         genomeViewFilterHeader = container.append('h5')
-            .attr('class', 'genomeViewFilterHeader red-text text-lighten-2 center-align')
-            .text('Drag the slider to filter smaller blocks');
+            .attr('class', 'genomeViewFilterHeader red-text text-lighten-2 center-align');
+
 
     }
 
@@ -42,11 +42,17 @@ export default function(container, configuration, alignmentList, genomeLibrary, 
         genomeViewHeader.text("Source or Target Empty");
     } else if (configuration.markers.source.length == 1 && configuration.markers.target.length == 1) {
         configuration.chromosomeView.markers = configuration.markers;
+        genomeViewSVG.classed('hide', true);
+        genomeViewHeader.text("");
+        genomeViewFilterHeader.text("");
+        // remove slider and any content 
+        container.selectAll('.genomeViewFilter').remove();
         chromosomeView(container, configuration, alignmentList, genomeLibrary, chromosomeMap);
     } else {
 
         genomeViewSVG.classed('hide', false);
         genomeViewHeader.text("Genome View");
+        genomeViewFilterHeader.text('Drag the slider to filter smaller blocks');
 
         configuration = markerSetup(genomeViewSVG, configuration, chromosomeMap, function(sourceMarkerID, targetMarkerID) {
             configuration.chromosomeView.markers = { 'source': [sourceMarkerID], 'target': [targetMarkerID] };
