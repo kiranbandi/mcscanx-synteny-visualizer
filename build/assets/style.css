@@ -36,8 +36,19 @@ body {
     cursor: pointer;
 }
 
+.link-polygon {
+    stroke: none;
+    fill-opacity: .5;
+    cursor: pointer;
+}
+
 .link.hiddenLink {
     stroke-opacity: .01;
+    pointer-events: none;
+}
+
+.link-polygon.hiddenLink {
+    fill-opacity: .01;
     pointer-events: none;
 }
 
@@ -46,8 +57,13 @@ body {
     pointer-events: all;
 }
 
-.hover-link:hover {
-    stroke-opacity: .9;
+.link-polygon.activeLink.link-polygon.hiddenLink {
+    fill-opacity: .9;
+    pointer-events: all;
+}
+
+.hover-link-polygon:hover {
+    fill-opacity: .9;
 }
 
 .markersText {

@@ -140,7 +140,7 @@ function drawMarkers(svg, configuration, chromosomeViewCallback) {
 
 function markerHover(d) {
     if (this.markerListId == 'source' && !currentClickState.clicked) {
-        d3.selectAll(".genomeViewSVG .link").classed('hiddenLink', true);
+        d3.selectAll(".genomeViewSVG .genome-link").classed('hiddenLink', true);
         d3.selectAll('.genomeViewSVG .link-source-' + d.key).classed('activeLink', true);
     }
 }
@@ -158,7 +158,7 @@ function markerClick(d) {
         d3.selectAll('.genomeViewSVG .hiddenLink').classed('hiddenLink', false);
         d3.selectAll('.genomeViewSVG .activeLink').classed('activeLink', false);
         // set current source links to active
-        d3.selectAll(".genomeViewSVG .link").classed('hiddenLink', true);
+        d3.selectAll(".genomeViewSVG .genome-link").classed('hiddenLink', true);
         d3.selectAll('.genomeViewSVG .link-source-' + d.key).classed('activeLink', true);
         currentClickState.clicked = true;
         currentClickState.sourceMarkerId = d.key;
