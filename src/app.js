@@ -48,7 +48,7 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
         genomeViewContainer = rootContainer.append('div')
         .attr('class', 'genomeViewContainer'),
         dotViewContainer = rootContainer.append('div')
-        .attr('class', 'dotViewContainer hide');
+        .attr('class', 'dotViewContainer');
 
     // markerPositions and links are populated  
     // need to reconfigure seperately for each plot indivually at some point in the not so far future
@@ -90,19 +90,12 @@ function start(syntenyInformation, alignmentList, genomeLibrary, chromosomeMap) 
 
     // Initialise Filter Panel
     filterPanel(headContainer, configuration, chromosomeMap, function(selectedMarkers, isDarkTheme, isDotPlot) {
-        // show hide plots based on options
-        genomeViewContainer.classed('hide', isDotPlot);
-        dotViewContainer.classed('hide', !isDotPlot);
         // filter markers
         configuration.markers = selectedMarkers;
         configuration.isDarkTheme = isDarkTheme;
         // process alignments for given markers
         let updatedAlignmentList = processAlignment(configuration.markers, alignmentList);
-        // call the respective plot generating functions
-        if (isDotPlot) {
-            dotView(dotViewContainer, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
-        } else {
-            genomeView(genomeViewContainer, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
-        }
+        dotView(dotViewContainer, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
+        genomeView(genomeViewContainer, configuration, updatedAlignmentList, genomeLibrary, chromosomeMap);
     });
 }

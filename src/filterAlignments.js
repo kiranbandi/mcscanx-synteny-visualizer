@@ -14,7 +14,7 @@ export default function(markers, alignmentList) {
                 filteredList.push(alignment);
             }
             // if the alignment is from target to source we flip the alignment  
-            else if ((sourceKeyList.indexOf(target) > -1) && (targetKeyList.indexOf(source) > -1)) {
+            if ((sourceKeyList.indexOf(target) > -1) && (targetKeyList.indexOf(source) > -1)) {
 
                 let flippedAlignment = _.clone(alignment);
 
